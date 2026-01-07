@@ -64,10 +64,12 @@ export const Dashboard = ({ data, totalValue }) => {
                                     <p className="text-xs text-neutral-500">{stock.代號}</p>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <p className="font-bold text-sm md:text-base">{formatCurrency(stock.現價)}</p>
-                                <p className="text-xs text-neutral-500">
-                                    {stock.股數} 股
+                            <div className="text-right space-y-0.5">
+                                <p className="text-sm font-medium text-neutral-300">
+                                    {stock.現價?.toLocaleString()} <span className="text-xs text-neutral-500">| {stock.股數?.toLocaleString()} 股</span>
+                                </p>
+                                <p className="font-bold text-sm md:text-base text-blue-400">
+                                    {formatCurrency(stock.市值)}
                                 </p>
                             </div>
                         </div>
