@@ -1,0 +1,10 @@
+
+> stock-asset-manager@0.0.0 lint
+> eslint .
+
+
+D:\antigravity\stock-asset-manager\src\App.jsx
+  10:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+✖ 1 problem (1 error, 0 warnings)
+
