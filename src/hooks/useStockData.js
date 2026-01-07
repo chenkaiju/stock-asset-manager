@@ -11,8 +11,14 @@ const MOCK_DATA = [
 export const useStockData = () => {
     const [data, setData] = useState(MOCK_DATA);
     const [loading, setLoading] = useState(false);
-    const [sheetUrl, setSheetUrl] = useState('');
+    const [sheetUrl, setSheetUrl] = useState(() => localStorage.getItem('sheetUrl') || '');
     const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (sheetUrl) {
+            localStorage.setItem('sheetUrl', sheetUrl);
+        }
+    }, [sheetUrl]);
 
     useEffect(() => {
         if (!sheetUrl) return;
