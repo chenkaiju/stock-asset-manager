@@ -50,7 +50,7 @@ export const Dashboard = ({ data, totalValue }) => {
                     主要持股
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {data.slice(0, 4).map((stock) => (
+                    {[...data].sort((a, b) => b.市值 - a.市值).slice(0, 10).map((stock) => (
                         <div
                             key={stock.代號}
                             className="flex items-center justify-between p-4 bg-neutral-900/30 rounded-2xl border border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all cursor-pointer group active:scale-[0.98]"
