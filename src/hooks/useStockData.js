@@ -52,20 +52,36 @@ export const useStockData = () => {
                 rawStocks = jsonData;
             } else if (jsonData && (jsonData.stocks || jsonData.history)) {
                 // New format: Object with keys
-                rawStocks = jsonData.stocks || [];
                 rawHistory = jsonData.history || [];
-                rawMarket = jsonData.market || [];
             } else {
                 throw new Error('Invalid data format: Expected array or object with stocks/history');
             }
 
-            // Normalize Market Data
-            const normalizedMarket = rawMarket.map(item => ({
-                name: item["名稱"] || item.name || "台指",
-                index: Number(item["指數"]) || Number(item.index) || 0,
-                change: item["漲跌"] || item.change || "0",
-                percent: item["漲跌幅"] || item.percent || "0%"
-            }))[0] || null;
+            // Fetch Market Data (TAIEX) Directly from Yahoo Finance via Proxy
+            try {
+                const proxyUrl = 'https://api.allorigins.win/get?url=';
+                const targetUrl = encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d');
+                const marketRes = await fetch(`${proxyUrl}${targetUrl}`);
+                const marketJson = await marketRes.json();
+                const marketDataObj = JSON.parse(marketJson.contents);
+                const result = marketDataObj.chart?.result?.[0];
+                if (result) {
+                    const meta = result.meta;
+                    const price = meta.regularMarketPrice;
+                    const prevClose = meta.previousClose;
+                    const change = price - prevClose;
+                    const percent = (change / prevClose) * 100;
+
+                    setMarketData({
+                        name: "台股加權",
+                        index: price,
+                        change: (change >= 0 ? "+" : "") + change.toFixed(2),
+                        percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
+                    });
+                }
+            } catch (mErr) {
+                console.error("Market fetch error:", mErr);
+            }
 
             // Basic normalization to ensure numbers are numbers
             const normalizedData = rawStocks.map(item => {
