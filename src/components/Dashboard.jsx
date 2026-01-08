@@ -71,7 +71,7 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                             {isPositive ? <Icons.ArrowUpRight size={14} /> : <Icons.ArrowDownRight size={14} />}
                             <span>
                                 {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
-                                ({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
+                                &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
                             </span>
                         </div>
                     </div>
