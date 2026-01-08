@@ -4,24 +4,13 @@ import { Icons } from './Icons';
 export const Header = ({ loading, sheetUrl, setSheetUrl, error }) => {
     return (
         <>
-            <header className="flex flex-col md:flex-row justify-end items-start md:items-center mb-8 gap-4">
-                <div className="flex w-full md:w-auto gap-2">
-                    <input
-                        type="text"
-                        placeholder="連結 Google Apps Script..."
-                        className="bg-neutral-900/50 border border-neutral-800 text-white rounded-xl px-4 py-2.5 text-sm w-full md:w-72 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all shadow-inner"
-                        value={sheetUrl}
-                        onChange={(e) => setSheetUrl(e.target.value)}
-                    />
-                    <button
-                        title="重新整理"
-                        onClick={() => setSheetUrl(sheetUrl)}
-                        disabled={loading}
-                        className="p-2.5 bg-neutral-800 hover:bg-neutral-700 rounded-xl border border-neutral-700 transition-all shrink-0 active:scale-95 disabled:opacity-50"
-                    >
-                        <Icons.RefreshedCcw size={20} className={`text-emerald-400 ${loading ? 'animate-spin' : ''}`} />
-                    </button>
-                </div>
+            <header className="mb-8">
+                {loading && (
+                    <div className="flex items-center gap-2 text-blue-400 text-sm font-medium animate-pulse">
+                        <Icons.RefreshedCcw size={16} className="animate-spin" />
+                        正在同步資料...
+                    </div>
+                )}
             </header>
 
             {error && (

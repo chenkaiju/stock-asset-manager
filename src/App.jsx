@@ -4,11 +4,12 @@ import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { StockList } from './components/StockList';
 import { HistoryChart } from './components/HistoryChart';
+import { DataSource } from './components/DataSource';
 import { useStockData } from './hooks/useStockData';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { data, historyData, marketData, loading, error, sheetUrl, setSheetUrl, totalValue } = useStockData();
+  const { data, historyData, marketData, loading, error, sheetUrl, setSheetUrl, totalValue, refresh } = useStockData();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-24 md:pb-0 md:pl-64 font-sans">
@@ -22,8 +23,6 @@ export default function App() {
           error={error}
         />
 
-
-
         {activeTab === 'dashboard' && (
           <Dashboard data={data} totalValue={totalValue} marketData={marketData} />
         )}
@@ -34,6 +33,16 @@ export default function App() {
 
         {activeTab === 'list' && (
           <StockList data={data} />
+        )}
+
+        {activeTab === 'datasource' && (
+          <DataSource
+            sheetUrl={sheetUrl}
+            setSheetUrl={setSheetUrl}
+            error={error}
+            loading={loading}
+            refresh={refresh}
+          />
         )}
       </main>
     </div>
