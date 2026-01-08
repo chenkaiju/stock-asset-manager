@@ -51,13 +51,6 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                         <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
                             <Icons.Wallet size={16} /> 總資產估值
                         </p>
-
-                        <div className="bg-white/5 px-4 py-2 rounded-xl border border-white/5 backdrop-blur-md">
-                            <p className="text-neutral-400 text-[10px] mb-0.5">持股</p>
-                            <p className="text-xl font-bold text-white leading-none">
-                                {data.length} <span className="text-xs text-neutral-500 font-normal">檔</span>
-                            </p>
-                        </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-2">
@@ -82,7 +75,10 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
             <section>
                 <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
                     <Icons.TrendingUp size={18} className="text-blue-400" />
-                    主要持股
+                    <span>主要持股</span>
+                    <span className="text-xs font-normal text-neutral-500 bg-neutral-800 px-2 py-0.5 rounded-lg border border-white/5">
+                        共 {data.length} 檔
+                    </span>
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[...data].sort((a, b) => b.市值 - a.市值).slice(0, 10).map((stock) => (
