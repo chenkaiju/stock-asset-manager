@@ -106,7 +106,7 @@ export const useStockData = () => {
                     totalGrow: totalGrowStr,
                     annualized: item["年化報酬率"] || item.annualized || "0%"
                 };
-            }).filter(item => item !== null);
+            }).filter(item => item !== null && item.value > 0);
 
             setData(normalizedData);
             setHistoryData(normalizedHistory);
