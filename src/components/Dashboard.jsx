@@ -29,11 +29,15 @@ export const Dashboard = ({ data, totalValue }) => {
                         <h3 className="text-3xl md:text-4xl font-bold mt-2 tracking-tight">{data.length} <span className="text-lg text-neutral-500">檔</span></h3>
                     </div>
                     <div className="flex -space-x-3 mt-4">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="w-10 h-10 rounded-full bg-neutral-800 border-2 border-[#0a0a0a] flex items-center justify-center text-xs font-bold text-neutral-300 shadow-lg">
-                                {data[i - 1]?.股票名稱[0]}
-                            </div>
-                        ))}
+                        {[1, 2, 3].map(i => {
+                            const stock = data[i - 1];
+                            if (!stock) return null;
+                            return (
+                                <div key={i} className="w-10 h-10 rounded-full bg-neutral-800 border-2 border-[#0a0a0a] flex items-center justify-center text-xs font-bold text-neutral-300 shadow-lg">
+                                    {stock.股票名稱?.[0] || '?'}
+                                </div>
+                            );
+                        })}
                         {data.length > 3 && (
                             <div className="w-10 h-10 rounded-full bg-neutral-900 border-2 border-[#0a0a0a] flex items-center justify-center text-xs text-neutral-500">
                                 +{data.length - 3}

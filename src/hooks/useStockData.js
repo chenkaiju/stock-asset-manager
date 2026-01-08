@@ -33,8 +33,13 @@ export const useStockData = () => {
             if (!response.ok) throw new Error('Failed to fetch data');
             const jsonData = await response.json();
 
+            if (!jsonData || !Array.isArray(jsonData)) {
+                throw new Error('Invalid data format: Expected an array from Google Sheet');
+            }
+
             // Basic normalization to ensure numbers are numbers
             const normalizedData = jsonData.map(item => {
+                if (!item) return null; // Safety check
                 const quantity = Number(item["股數"]) || 0;
                 const price = Number(item["股價"]) || 0; // User column: 股價
                 const marketValue = Number(item["個股現值"]) || (quantity * price); // User column: 個股現值
@@ -48,7 +53,7 @@ export const useStockData = () => {
                     "現價": price,
                     "市值": marketValue,
                 };
-            });
+            }).filter(item => item !== null); // Remove nulls
 
             setData(normalizedData);
         } catch (err) {
