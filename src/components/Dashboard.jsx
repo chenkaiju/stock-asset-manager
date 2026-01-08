@@ -2,7 +2,16 @@ import React from 'react';
 import { Icons } from './Icons';
 import { formatCurrency } from '../utils/formatters';
 
-export const Dashboard = ({ data, totalValue, marketData }) => {
+export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
+    // Calculate Today's Change based on most recent historical value
+    const lastHistoryValue = (historyData && historyData.length > 0)
+        ? historyData[historyData.length - 1].value
+        : totalValue;
+
+    const todayChange = totalValue - lastHistoryValue;
+    const todayChangePercent = lastHistoryValue !== 0 ? (todayChange / lastHistoryValue) * 100 : 0;
+    const isPositive = todayChange >= 0;
+
     return (
         <div className="space-y-6">
             {/* Market Index Card */}
@@ -51,13 +60,19 @@ export const Dashboard = ({ data, totalValue, marketData }) => {
                         </div>
                     </div>
 
-                    <div>
-                        <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-white mb-2">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-2">
+                        <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-white">
                             {formatCurrency(totalValue)}
                         </h3>
-                        <div className="flex items-center space-x-2 text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-400/20">
-                            <Icons.ArrowUpRight size={14} />
-                            <span>2.4% 今日上漲</span>
+                        <div className={`flex items-center space-x-2 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border ${isPositive
+                                ? 'text-red-400 bg-red-400/10 border-red-400/20'
+                                : 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
+                            }`}>
+                            {isPositive ? <Icons.ArrowUpRight size={14} /> : <Icons.ArrowDownRight size={14} />}
+                            <span>
+                                {isPositive ? '+' : ''}{todayChange.toLocaleString()}
+                                ({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
+                            </span>
                         </div>
                     </div>
                 </div>

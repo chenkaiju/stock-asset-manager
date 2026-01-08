@@ -24,7 +24,7 @@ export default function App() {
         />
 
         {activeTab === 'dashboard' && (
-          <Dashboard data={data} totalValue={totalValue} marketData={marketData} />
+          <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} />
         )}
 
         {activeTab === 'history' && (
