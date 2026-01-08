@@ -5,11 +5,23 @@ import { Dashboard } from './components/Dashboard';
 import { StockList } from './components/StockList';
 import { HistoryChart } from './components/HistoryChart';
 import { DataSource } from './components/DataSource';
+import { PerformanceStats } from './components/PerformanceStats';
 import { useStockData } from './hooks/useStockData';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { data, historyData, marketData, loading, error, sheetUrl, setSheetUrl, totalValue, refresh } = useStockData();
+  const {
+    data,
+    historyData,
+    performanceStats,
+    marketData,
+    loading,
+    error,
+    sheetUrl,
+    setSheetUrl,
+    totalValue,
+    refresh
+  } = useStockData();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-24 md:pb-0 md:pl-64 font-sans">
@@ -43,6 +55,10 @@ export default function App() {
             loading={loading}
             refresh={refresh}
           />
+        )}
+
+        {activeTab === 'performance' && (
+          <PerformanceStats stats={performanceStats} />
         )}
       </main>
     </div>

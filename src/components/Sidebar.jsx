@@ -52,6 +52,16 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                     <Icons.Database size={20} className="md:w-6 md:h-6" />
                     <span className="text-[10px] md:text-base font-medium">資料來源</span>
                 </button>
+                <button
+                    onClick={() => setActiveTab('performance')}
+                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'performance'
+                        ? 'text-blue-400 bg-blue-400/10'
+                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
+                        }`}
+                >
+                    <Icons.Activity size={20} className="md:w-6 md:h-6" />
+                    <span className="text-[10px] md:text-base font-medium">績效分析</span>
+                </button>
             </div>
         </nav>
     );

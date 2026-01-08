@@ -23,6 +23,7 @@ export const useStockData = () => {
     const [loading, setLoading] = useState(false);
     const [sheetUrl, setSheetUrl] = useState(() => localStorage.getItem('sheetUrl') || '');
     const [error, setError] = useState(null);
+    const [performanceStats, setPerformanceStats] = useState(null);
 
     useEffect(() => {
         if (sheetUrl) {
@@ -45,17 +46,18 @@ export const useStockData = () => {
 
             let rawStocks = [];
             let rawHistory = [];
-            let rawMarket = [];
+            let rawStats = null; // Initialize rawStats
 
             if (Array.isArray(jsonData)) {
                 // Legacy support: The whole response is the stocks array
                 rawStocks = jsonData;
-            } else if (jsonData && (jsonData.stocks || jsonData.history)) {
+            } else if (jsonData && (jsonData.stocks || jsonData.history || jsonData.stats)) {
                 // New format: Object with keys
                 rawStocks = jsonData.stocks || [];
                 rawHistory = jsonData.history || [];
+                rawStats = jsonData.stats || null; // Parse result.stats
             } else {
-                throw new Error('Invalid data format: Expected array or object with stocks/history');
+                throw new Error('Invalid data format: Expected array or object with stocks/history/stats');
             }
 
             // Fetch Market Data (TAIEX) Directly from Yahoo Finance via Proxy
@@ -140,6 +142,7 @@ export const useStockData = () => {
 
             setData(normalizedData);
             setHistoryData(normalizedHistory);
+            setPerformanceStats(rawStats);
         } catch (err) {
             console.error("Fetch error:", err);
             // Only set error state if it's not a background refresh (to avoid annoying popups)
@@ -164,7 +167,16 @@ export const useStockData = () => {
         return () => clearInterval(intervalId);
     }, [fetchData]);
 
-    const totalValue = data.reduce((acc, curr) => acc + curr.市值, 0);
-
-    return { data, historyData, marketData, loading, error, sheetUrl, setSheetUrl, totalValue, refresh: () => fetchData(false) };
+    return {
+        data,
+        historyData,
+        performanceStats,
+        marketData,
+        loading,
+        error,
+        sheetUrl,
+        setSheetUrl,
+        totalValue: data.reduce((acc, stock) => acc + (stock.市值 || 0), 0),
+        refresh: () => fetchData(false)
+    };
 };
