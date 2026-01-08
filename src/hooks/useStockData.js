@@ -68,17 +68,20 @@ export const useStockData = () => {
                 const result = marketDataObj.chart?.result?.[0];
                 if (result) {
                     const meta = result.meta;
-                    const price = meta.regularMarketPrice;
-                    const prevClose = meta.previousClose;
-                    const change = price - prevClose;
-                    const percent = (change / prevClose) * 100;
+                    const price = Number(meta.regularMarketPrice);
+                    const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
 
-                    setMarketData({
-                        name: "台股加權",
-                        index: price,
-                        change: (change >= 0 ? "+" : "") + change.toFixed(2),
-                        percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
-                    });
+                    if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
+                        const change = price - prevClose;
+                        const percent = (change / prevClose) * 100;
+
+                        setMarketData({
+                            name: "台股加權",
+                            index: price,
+                            change: (change >= 0 ? "+" : "") + change.toFixed(2),
+                            percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
+                        });
+                    }
                 }
             } catch (mErr) {
                 console.error("Market fetch error:", mErr);
