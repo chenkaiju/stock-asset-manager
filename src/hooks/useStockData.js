@@ -8,8 +8,17 @@ const MOCK_DATA = [
     { "股票名稱": "NVIDIA", "代號": "NVDA", "股數": 50, "現價": 550, "市值": 852500 },
 ];
 
+const MOCK_HISTORY = [
+    { date: "2024-01-01", value: 2000000, dailyGrow: "+1.2%", totalGrow: "+0%", annualized: "0%" },
+    { date: "2024-02-01", value: 2150000, dailyGrow: "+0.8%", totalGrow: "+7.5%", annualized: "7.5%" },
+    { date: "2024-03-01", value: 2300000, dailyGrow: "+1.5%", totalGrow: "+15%", annualized: "15%" },
+    { date: "2024-04-01", value: 2280000, dailyGrow: "-0.9%", totalGrow: "+14%", annualized: "14%" },
+    { date: "2024-05-01", value: 2450000, dailyGrow: "+2.1%", totalGrow: "+22.5%", annualized: "22.5%" },
+];
+
 export const useStockData = () => {
     const [data, setData] = useState(MOCK_DATA);
+    const [historyData, setHistoryData] = useState(MOCK_HISTORY);
     const [loading, setLoading] = useState(false);
     const [sheetUrl, setSheetUrl] = useState(() => localStorage.getItem('sheetUrl') || '');
     const [error, setError] = useState(null);
@@ -33,12 +42,23 @@ export const useStockData = () => {
             if (!response.ok) throw new Error('Failed to fetch data');
             const jsonData = await response.json();
 
-            if (!jsonData || !Array.isArray(jsonData)) {
-                throw new Error('Invalid data format: Expected an array from Google Sheet');
+            let rawStocks = [];
+            let rawHistory = [];
+
+            if (Array.isArray(jsonData)) {
+                // Legacy support: The whole response is the stocks array
+                rawStocks = jsonData;
+            } else if (jsonData && (jsonData.stocks || jsonData.history)) {
+                // New format: Object with keys
+                rawStocks = jsonData.stocks || [];
+                rawHistory = jsonData.history || [];
+            } else {
+                throw new Error('Invalid data format: Expected array or object with stocks/history');
             }
 
+
             // Basic normalization to ensure numbers are numbers
-            const normalizedData = jsonData.map(item => {
+            const normalizedData = rawStocks.map(item => {
                 if (!item) return null; // Safety check
                 const quantity = Number(item["股數"]) || 0;
                 const price = Number(item["股價"]) || 0; // User column: 股價
@@ -55,7 +75,21 @@ export const useStockData = () => {
                 };
             }).filter(item => item !== null); // Remove nulls
 
+
+            // Normalize History Data
+            const normalizedHistory = rawHistory.map(item => {
+                if (!item) return null;
+                return {
+                    date: item["日期"] || item.date,
+                    value: Number(item["總值"]) || Number(item.value) || 0,
+                    dailyGrow: item["當日成長"] || item.dailyGrow || "0%",
+                    totalGrow: item["累積成長"] || item.totalGrow || "0%",
+                    annualized: item["年化報酬率"] || item.annualized || "0%"
+                };
+            }).filter(item => item !== null);
+
             setData(normalizedData);
+            setHistoryData(normalizedHistory);
         } catch (err) {
             console.error("Fetch error:", err);
             // Only set error state if it's not a background refresh (to avoid annoying popups)
@@ -82,5 +116,5 @@ export const useStockData = () => {
 
     const totalValue = data.reduce((acc, curr) => acc + curr.市值, 0);
 
-    return { data, loading, error, sheetUrl, setSheetUrl, totalValue, refresh: () => fetchData(false) };
+    return { data, historyData, loading, error, sheetUrl, setSheetUrl, totalValue, refresh: () => fetchData(false) };
 };

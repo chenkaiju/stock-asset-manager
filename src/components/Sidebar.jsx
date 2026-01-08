@@ -23,6 +23,16 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                     <span className="text-[10px] md:text-base font-medium">概覽</span>
                 </button>
                 <button
+                    onClick={() => setActiveTab('history')}
+                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'history'
+                        ? 'text-blue-400 bg-blue-400/10'
+                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
+                        }`}
+                >
+                    <Icons.TrendingUp size={20} className="md:w-6 md:h-6" />
+                    <span className="text-[10px] md:text-base font-medium">歷史走勢</span>
+                </button>
+                <button
                     onClick={() => setActiveTab('list')}
                     className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'list'
                         ? 'text-blue-400 bg-blue-400/10'

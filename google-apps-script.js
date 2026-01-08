@@ -1,24 +1,32 @@
 function doGet() {
-    const sheetName = "現值"; // Your specific sheet name
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName(sheetName);
 
-    if (!sheet) {
-        return ContentService.createTextOutput(JSON.stringify({ error: "Sheet not found" }))
-            .setMimeType(ContentService.MimeType.JSON);
-    }
+    const getSheetData = (sheetName) => {
+        const sheet = ss.getSheetByName(sheetName);
+        if (!sheet) return [];
 
-    const [headers, ...rows] = sheet.getDataRange().getValues();
+        const range = sheet.getDataRange();
+        if (range.isBlank()) return [];
 
-    // Convert rows to array of objects
-    const data = rows.map(row => {
-        const obj = {};
-        headers.forEach((header, index) => {
-            obj[header] = row[index];
+        const [headers, ...rows] = range.getValues();
+
+        return rows.map(row => {
+            const obj = {};
+            headers.forEach((header, index) => {
+                obj[header] = row[index];
+            });
+            return obj;
         });
-        return obj;
-    });
+    };
 
-    return ContentService.createTextOutput(JSON.stringify(data))
+    const stocks = getSheetData("現值");
+    const history = getSheetData("歷史現值");
+
+    const result = {
+        stocks: stocks,
+        history: history
+    };
+
+    return ContentService.createTextOutput(JSON.stringify(result))
         .setMimeType(ContentService.MimeType.JSON);
 }

@@ -3,11 +3,11 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { StockList } from './components/StockList';
-import { useStockData } from './hooks/useStockData';
+import { HistoryChart } from './components/HistoryChart';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { data, loading, error, sheetUrl, setSheetUrl, totalValue } = useStockData();
+  const { data, historyData, loading, error, sheetUrl, setSheetUrl, totalValue } = useStockData();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-24 md:pb-0 md:pl-64 font-sans">
@@ -23,6 +23,10 @@ export default function App() {
 
         {activeTab === 'dashboard' && (
           <Dashboard data={data} totalValue={totalValue} />
+        )}
+
+        {activeTab === 'history' && (
+          <HistoryChart historyData={historyData} />
         )}
 
         {activeTab === 'list' && (
