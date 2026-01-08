@@ -65,12 +65,12 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                             {formatCurrency(totalValue)}
                         </h3>
                         <div className={`flex items-center space-x-2 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border ${isPositive
-                                ? 'text-red-400 bg-red-400/10 border-red-400/20'
-                                : 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
+                            ? 'text-red-400 bg-red-400/10 border-red-400/20'
+                            : 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
                             }`}>
                             {isPositive ? <Icons.ArrowUpRight size={14} /> : <Icons.ArrowDownRight size={14} />}
                             <span>
-                                {isPositive ? '+' : ''}{todayChange.toLocaleString()}
+                                {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
                                 ({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
                             </span>
                         </div>
