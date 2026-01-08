@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { StockList } from './components/StockList';
 import { HistoryChart } from './components/HistoryChart';
+import { useStockData } from './hooks/useStockData';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -20,6 +21,8 @@ export default function App() {
           setSheetUrl={setSheetUrl}
           error={error}
         />
+
+
 
         {activeTab === 'dashboard' && (
           <Dashboard data={data} totalValue={totalValue} />

@@ -30,10 +30,7 @@ export const HistoryChart = ({ historyData }) => {
 
                 <div className="h-[400px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart
-                            data={historyData}
-                            margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                        >
+                        <AreaChart data={historyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
@@ -47,10 +44,7 @@ export const HistoryChart = ({ historyData }) => {
                                 axisLine={false}
                                 tickLine={false}
                                 tickMargin={10}
-                                tickFormatter={(str) => {
-                                    // Try to format simplistic date if needed
-                                    return str.split('T')[0];
-                                }}
+                                tickFormatter={(str) => str.split('T')[0]}
                             />
                             <YAxis
                                 tick={{ fill: '#737373', fontSize: 12 }}
@@ -64,8 +58,7 @@ export const HistoryChart = ({ historyData }) => {
                                     backgroundColor: 'rgba(10, 10, 10, 0.8)',
                                     borderColor: 'rgba(255, 255, 255, 0.1)',
                                     borderRadius: '12px',
-                                    backdropFilter: 'blur(8px)',
-                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                                    backdropFilter: 'blur(8px)'
                                 }}
                                 itemStyle={{ color: '#fff' }}
                                 labelStyle={{ color: '#a3a3a3', marginBottom: '4px' }}
@@ -82,28 +75,28 @@ export const HistoryChart = ({ historyData }) => {
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
-            </div>
 
-            {/* Detailed History Table (Optional/Simple view) */}
-            <div className="overflow-hidden rounded-3xl border border-white/5 bg-neutral-900/20">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-white/5 text-neutral-400 text-sm">
-                            <th className="px-6 py-4 font-medium">日期</th>
-                            <th className="px-6 py-4 font-medium text-right">總資產</th>
-                            <th className="px-6 py-4 font-medium text-right text-emerald-400">累積成長</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {historyData.slice().reverse().map((item, index) => (
-                            <tr key={index} className="hover:bg-white/5 transition-colors">
-                                <td className="px-6 py-4 text-sm text-neutral-300">{item.date}</td>
-                                <td className="px-6 py-4 text-right font-bold">{formatCurrency(item.value)}</td>
-                                <td className="px-6 py-4 text-right text-sm text-emerald-400 font-medium">{item.totalGrow}</td>
+                {/* Detailed History Table (Optional/Simple view) */}
+                <div className="overflow-hidden rounded-3xl border border-white/5 bg-neutral-900/20">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-white/5 text-neutral-400 text-sm">
+                                <th className="px-6 py-4 font-medium">日期</th>
+                                <th className="px-6 py-4 font-medium text-right">總資產</th>
+                                <th className="px-6 py-4 font-medium text-right text-emerald-400">累積成長</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {historyData.slice().reverse().map((item, index) => (
+                                <tr key={index} className="hover:bg-white/5 transition-colors">
+                                    <td className="px-6 py-4 text-sm text-neutral-300">{item.date}</td>
+                                    <td className="px-6 py-4 text-right font-bold">{formatCurrency(item.value)}</td>
+                                    <td className="px-6 py-4 text-right text-sm text-emerald-400 font-medium">{item.totalGrow}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
