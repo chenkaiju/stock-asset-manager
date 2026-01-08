@@ -2,12 +2,39 @@ import React from 'react';
 import { Icons } from './Icons';
 import { formatCurrency } from '../utils/formatters';
 
-export const Dashboard = ({ data, totalValue }) => {
+export const Dashboard = ({ data, totalValue, marketData }) => {
     return (
         <div className="space-y-6">
+            {/* Market Index Card */}
+            {marketData && (
+                <div className="grid grid-cols-1 gap-4">
+                    <div className="p-4 bg-neutral-900/30 rounded-2xl border border-white/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                                <Icons.TrendingUp size={20} className="text-orange-500" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">Market Index</p>
+                                <h3 className="text-base font-bold text-white">{marketData.name}</h3>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-lg font-bold text-white tabular-nums">
+                                {marketData.index?.toLocaleString()}
+                            </div>
+                            <div className={`text-xs font-bold flex items-center justify-end gap-1 ${marketData.change?.includes('-') ? 'text-red-400' : 'text-emerald-400'}`}>
+                                {marketData.change?.includes('-') ? <Icons.ArrowDownRight size={12} /> : <Icons.ArrowUpRight size={12} />}
+                                <span>{marketData.change} ({marketData.percent})</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Summary Cards */}
             {/* Summary Card - Single Full Width */}
             <div className="relative p-6 md:p-8 bg-gradient-to-br from-blue-900/40 to-slate-900/40 rounded-3xl border border-blue-500/20 backdrop-blur-sm overflow-hidden">
+
                 <div className="absolute top-0 right-0 p-32 bg-blue-500/10 blur-3xl rounded-full translate-x-12 -translate-y-12"></div>
 
                 <div className="relative z-10 flex flex-col justify-between h-full space-y-4 md:space-y-0">

@@ -19,6 +19,7 @@ const MOCK_HISTORY = [
 export const useStockData = () => {
     const [data, setData] = useState(MOCK_DATA);
     const [historyData, setHistoryData] = useState(MOCK_HISTORY);
+    const [marketData, setMarketData] = useState({ name: "台股加權", index: 23500, change: "+150.5", percent: "+0.64%" });
     const [loading, setLoading] = useState(false);
     const [sheetUrl, setSheetUrl] = useState(() => localStorage.getItem('sheetUrl') || '');
     const [error, setError] = useState(null);
@@ -44,6 +45,7 @@ export const useStockData = () => {
 
             let rawStocks = [];
             let rawHistory = [];
+            let rawMarket = [];
 
             if (Array.isArray(jsonData)) {
                 // Legacy support: The whole response is the stocks array
@@ -52,10 +54,18 @@ export const useStockData = () => {
                 // New format: Object with keys
                 rawStocks = jsonData.stocks || [];
                 rawHistory = jsonData.history || [];
+                rawMarket = jsonData.market || [];
             } else {
                 throw new Error('Invalid data format: Expected array or object with stocks/history');
             }
 
+            // Normalize Market Data
+            const normalizedMarket = rawMarket.map(item => ({
+                name: item["名稱"] || item.name || "台指",
+                index: Number(item["指數"]) || Number(item.index) || 0,
+                change: item["漲跌"] || item.change || "0",
+                percent: item["漲跌幅"] || item.percent || "0%"
+            }))[0] || null;
 
             // Basic normalization to ensure numbers are numbers
             const normalizedData = rawStocks.map(item => {
@@ -110,6 +120,7 @@ export const useStockData = () => {
 
             setData(normalizedData);
             setHistoryData(normalizedHistory);
+            if (normalizedMarket) setMarketData(normalizedMarket);
         } catch (err) {
             console.error("Fetch error:", err);
             // Only set error state if it's not a background refresh (to avoid annoying popups)
@@ -136,5 +147,5 @@ export const useStockData = () => {
 
     const totalValue = data.reduce((acc, curr) => acc + curr.市值, 0);
 
-    return { data, historyData, loading, error, sheetUrl, setSheetUrl, totalValue, refresh: () => fetchData(false) };
+    return { data, historyData, marketData, loading, error, sheetUrl, setSheetUrl, totalValue, refresh: () => fetchData(false) };
 };

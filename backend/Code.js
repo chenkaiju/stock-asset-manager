@@ -21,10 +21,12 @@ function doGet() {
 
     const stocks = getSheetData("現值");
     const history = getSheetData("歷史現值");
+    const market = getSheetData("大盤");
 
     const result = {
         stocks: stocks,
-        history: history
+        history: history,
+        market: market
     };
 
     return ContentService.createTextOutput(JSON.stringify(result))

@@ -8,7 +8,7 @@ import { useStockData } from './hooks/useStockData';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { data, historyData, loading, error, sheetUrl, setSheetUrl, totalValue } = useStockData();
+  const { data, historyData, marketData, loading, error, sheetUrl, setSheetUrl, totalValue } = useStockData();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-24 md:pb-0 md:pl-64 font-sans">
@@ -25,7 +25,7 @@ export default function App() {
 
 
         {activeTab === 'dashboard' && (
-          <Dashboard data={data} totalValue={totalValue} />
+          <Dashboard data={data} totalValue={totalValue} marketData={marketData} />
         )}
 
         {activeTab === 'history' && (
