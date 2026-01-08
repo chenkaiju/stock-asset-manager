@@ -10,7 +10,7 @@ export const Dashboard = ({ data, totalValue }) => {
             <div className="relative p-6 md:p-8 bg-gradient-to-br from-blue-900/40 to-slate-900/40 rounded-3xl border border-blue-500/20 backdrop-blur-sm overflow-hidden">
                 <div className="absolute top-0 right-0 p-32 bg-blue-500/10 blur-3xl rounded-full translate-x-12 -translate-y-12"></div>
 
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+                <div className="relative z-10">
                     <div>
                         <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
                             <Icons.Wallet size={16} /> 總資產估值
@@ -24,10 +24,10 @@ export const Dashboard = ({ data, totalValue }) => {
                         </div>
                     </div>
 
-                    <div className="bg-white/5 px-5 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
-                        <p className="text-neutral-400 text-xs mb-1">持股數量</p>
-                        <p className="text-2xl font-bold text-white leading-none">
-                            {data.length} <span className="text-sm text-neutral-500 font-normal">檔</span>
+                    <div className="absolute top-6 right-6 bg-white/5 px-4 py-2 rounded-xl border border-white/5 backdrop-blur-md">
+                        <p className="text-neutral-400 text-[10px] mb-0.5">持股</p>
+                        <p className="text-xl font-bold text-white leading-none">
+                            {data.length} <span className="text-xs text-neutral-500 font-normal">檔</span>
                         </p>
                     </div>
                 </div>
