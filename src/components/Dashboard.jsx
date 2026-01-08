@@ -18,12 +18,12 @@ export const Dashboard = ({ data, totalValue, marketData }) => {
                                 <h3 className="text-base font-bold text-white">{marketData.name}</h3>
                             </div>
                         </div>
-                        <div className="text-right">
-                            <div className="text-lg font-bold text-white tabular-nums">
+                        <div className="flex items-baseline gap-4">
+                            <div className="text-2xl font-bold text-white tabular-nums">
                                 {marketData.index?.toLocaleString()}
                             </div>
-                            <div className={`text-xs font-bold flex items-center justify-end gap-1 ${marketData.change?.includes('-') ? 'text-red-400' : 'text-emerald-400'}`}>
-                                {marketData.change?.includes('-') ? <Icons.ArrowDownRight size={12} /> : <Icons.ArrowUpRight size={12} />}
+                            <div className={`text-base font-bold flex items-center gap-1 ${marketData.change?.includes('-') ? 'text-emerald-400' : 'text-red-400'}`}>
+                                {marketData.change?.includes('-') ? <Icons.ArrowDownRight size={16} /> : <Icons.ArrowUpRight size={16} />}
                                 <span>{marketData.change} ({marketData.percent})</span>
                             </div>
                         </div>
