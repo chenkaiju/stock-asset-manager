@@ -116,7 +116,13 @@ export const useStockData = () => {
                 let dateStr = "Unknown";
                 const rawDate = item["日期"] || item.date;
                 if (rawDate instanceof Date) {
-                    dateStr = rawDate.toISOString().split('T')[0];
+                    // Use Taiwan time for date consistency
+                    dateStr = rawDate.toLocaleDateString('zh-TW', {
+                        timeZone: 'Asia/Taipei',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    }).replace(/\//g, '-'); // Format: YYYY-MM-DD
                 } else if (typeof rawDate === 'string') {
                     dateStr = rawDate.split('T')[0];
                 }

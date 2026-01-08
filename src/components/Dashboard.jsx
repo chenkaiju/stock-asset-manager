@@ -5,9 +5,13 @@ import { formatCurrency } from '../utils/formatters';
 export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
     // Calculate Today's Change based on most recent historical value before today
     // Calculate Today's Change based on most recent historical value before today
-    // Use local time to avoid UTC offset issues (e.g. early morning in Taiwan)
-    const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    // Use Taiwan time to ensure consistency with data parsing
+    const todayStr = new Date().toLocaleDateString('zh-TW', {
+        timeZone: 'Asia/Taipei',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).replace(/\//g, '-');
 
     const candidates = historyData && historyData.length > 0
         ? historyData.filter(h => h.date < todayStr)
