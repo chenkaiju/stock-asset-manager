@@ -20,47 +20,63 @@ export const useStockData = () => {
         }
     }, [sheetUrl]);
 
-    useEffect(() => {
+    // Define fetchData with useCallback so it can be reused
+    const fetchData = useCallback(async (isBackground = false) => {
         if (!sheetUrl) return;
 
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await fetch(sheetUrl);
-                if (!response.ok) throw new Error('Failed to fetch data');
-                const jsonData = await response.json();
+        // Only show full loading state if not a background refresh
+        if (!isBackground) setLoading(true);
 
-                // Basic normalization to ensure numbers are numbers
-                const normalizedData = jsonData.map(item => {
-                    const quantity = Number(item["股數"]) || 0;
-                    const price = Number(item["股價"]) || 0; // User column: 股價
-                    const marketValue = Number(item["個股現值"]) || (quantity * price); // User column: 個股現值
+        setError(null);
+        try {
+            const response = await fetch(sheetUrl);
+            if (!response.ok) throw new Error('Failed to fetch data');
+            const jsonData = await response.json();
 
-                    return {
-                        ...item,
-                        // Internal App Keys mapped from Sheet Columns
-                        "股票名稱": item["股名"] || item["股票名稱"] || "Unknown", // User column: 股名
-                        "代號": item["股票代碼"] || item["代號"] || "0000", // User column: 股票代碼
-                        "股數": quantity,
-                        "現價": price,
-                        "市值": marketValue,
-                    };
-                });
+            // Basic normalization to ensure numbers are numbers
+            const normalizedData = jsonData.map(item => {
+                const quantity = Number(item["股數"]) || 0;
+                const price = Number(item["股價"]) || 0; // User column: 股價
+                const marketValue = Number(item["個股現值"]) || (quantity * price); // User column: 個股現值
 
-                setData(normalizedData);
-            } catch (err) {
-                console.error("Fetch error:", err);
+                return {
+                    ...item,
+                    // Internal App Keys mapped from Sheet Columns
+                    "股票名稱": item["股名"] || item["股票名稱"] || "Unknown", // User column: 股名
+                    "代號": item["股票代碼"] || item["代號"] || "0000", // User column: 股票代碼
+                    "股數": quantity,
+                    "現價": price,
+                    "市值": marketValue,
+                };
+            });
+
+            setData(normalizedData);
+        } catch (err) {
+            console.error("Fetch error:", err);
+            // Only set error state if it's not a background refresh (to avoid annoying popups)
+            // or if we have no data at all yet.
+            if (!isBackground || data === MOCK_DATA) {
                 setError(err.message);
-            } finally {
-                setLoading(false);
             }
-        };
+        } finally {
+            if (!isBackground) setLoading(false);
+        }
+    }, [sheetUrl, data]); // specific dependencies
 
-        fetchData();
-    }, [sheetUrl]);
+    useEffect(() => {
+        // Initial fetch
+        fetchData(false);
+
+        // Set up polling every 60 seconds
+        const intervalId = setInterval(() => {
+            fetchData(true);
+        }, 60000);
+
+        // Cleanup interval on unmount or when sheetUrl changes
+        return () => clearInterval(intervalId);
+    }, [fetchData]);
 
     const totalValue = data.reduce((acc, curr) => acc + curr.市值, 0);
 
-    return { data, loading, error, sheetUrl, setSheetUrl, totalValue };
+    return { data, loading, error, sheetUrl, setSheetUrl, totalValue, refresh: () => fetchData(false) };
 };
