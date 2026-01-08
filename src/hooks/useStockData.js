@@ -52,6 +52,7 @@ export const useStockData = () => {
                 rawStocks = jsonData;
             } else if (jsonData && (jsonData.stocks || jsonData.history)) {
                 // New format: Object with keys
+                rawStocks = jsonData.stocks || [];
                 rawHistory = jsonData.history || [];
             } else {
                 throw new Error('Invalid data format: Expected array or object with stocks/history');
@@ -136,7 +137,6 @@ export const useStockData = () => {
 
             setData(normalizedData);
             setHistoryData(normalizedHistory);
-            if (normalizedMarket) setMarketData(normalizedMarket);
         } catch (err) {
             console.error("Fetch error:", err);
             // Only set error state if it's not a background refresh (to avoid annoying popups)
