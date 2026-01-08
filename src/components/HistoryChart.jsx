@@ -75,27 +75,7 @@ export const HistoryChart = ({ historyData }) => {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Detailed History Table (Optional/Simple view) */}
-                <div className="overflow-hidden rounded-3xl border border-white/5 bg-neutral-900/20">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-white/5 text-neutral-400 text-sm">
-                                <th className="px-6 py-4 font-medium">日期</th>
-                                <th className="px-6 py-4 font-medium text-right">總資產</th>
-                                <th className="px-6 py-4 font-medium text-right text-emerald-400">累積成長</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {historyData.slice().reverse().map((item, index) => (
-                                <tr key={index} className="hover:bg-white/5 transition-colors">
-                                    <td className="px-6 py-4 text-sm text-neutral-300">{item.date}</td>
-                                    <td className="px-6 py-4 text-right font-bold">{formatCurrency(item.value)}</td>
-                                    <td className="px-6 py-4 text-right text-sm text-emerald-400 font-medium">{item.totalGrow}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+
             </div>
         </div>
     );
