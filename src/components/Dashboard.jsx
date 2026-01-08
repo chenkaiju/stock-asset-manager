@@ -4,7 +4,11 @@ import { formatCurrency } from '../utils/formatters';
 
 export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
     // Calculate Today's Change based on most recent historical value before today
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Calculate Today's Change based on most recent historical value before today
+    // Use local time to avoid UTC offset issues (e.g. early morning in Taiwan)
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
     const candidates = historyData && historyData.length > 0
         ? historyData.filter(h => h.date < todayStr)
         : [];
