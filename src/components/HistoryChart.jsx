@@ -23,9 +23,9 @@ export const HistoryChart = ({ historyData }) => {
                         <div key={index} className="flex items-center justify-between gap-4 mb-2 last:mb-0">
                             <span className="text-xs" style={{ color: entry.color }}>{entry.name}:</span>
                             <span className="text-sm font-bold text-white tabular-nums">
-                                {entry.name.includes('率') || entry.name.includes('幅度')
+                                {(entry.name.includes('率') || entry.name.includes('幅度')) && !entry.name.includes('夏普')
                                     ? (Number(entry.value) * 100).toFixed(2) + '%'
-                                    : Number(entry.value).toLocaleString()}
+                                    : Number(entry.value).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                             </span>
                         </div>
                     ))}
