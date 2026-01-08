@@ -54,14 +54,13 @@ export const useStockData = () => {
         } catch (err) {
             console.error("Fetch error:", err);
             // Only set error state if it's not a background refresh (to avoid annoying popups)
-            // or if we have no data at all yet.
-            if (!isBackground || data === MOCK_DATA) {
+            if (!isBackground) {
                 setError(err.message);
             }
         } finally {
             if (!isBackground) setLoading(false);
         }
-    }, [sheetUrl, data]); // specific dependencies
+    }, [sheetUrl]); // Removed data dependency to avoid infinite loop
 
     useEffect(() => {
         // Initial fetch
