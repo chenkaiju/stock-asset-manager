@@ -4,17 +4,7 @@ import { Icons } from './Icons';
 export const Header = ({ loading, sheetUrl, setSheetUrl, error }) => {
     return (
         <>
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                <div>
-                    <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-                        我的資產
-                        {loading && <span className="flex h-3 w-3 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span></span>}
-                    </h2>
-                    <p className="text-neutral-400 text-sm mt-1">
-                        {loading ? '資料更新中...' : `最後更新於：${new Date().toLocaleTimeString()}`}
-                    </p>
-                </div>
-
+            <header className="flex flex-col md:flex-row justify-end items-start md:items-center mb-8 gap-4">
                 <div className="flex w-full md:w-auto gap-2">
                     <input
                         type="text"
