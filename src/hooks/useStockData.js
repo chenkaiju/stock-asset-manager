@@ -79,11 +79,31 @@ export const useStockData = () => {
             // Normalize History Data
             const normalizedHistory = rawHistory.map(item => {
                 if (!item) return null;
+
+                // Handle Date Format (YYYY-MM-DD)
+                let dateStr = "Unknown";
+                const rawDate = item["日期"] || item.date;
+                if (rawDate instanceof Date) {
+                    dateStr = rawDate.toISOString().split('T')[0];
+                } else if (typeof rawDate === 'string') {
+                    dateStr = rawDate.split('T')[0];
+                }
+
+                // Handle Growth Percentage
+                let totalGrowStr = "0%";
+                const rawGrow = item["累積成長"] || item.totalGrow;
+                if (typeof rawGrow === 'number') {
+                    // Assuming number like 0.15 for 15%
+                    totalGrowStr = `${(rawGrow * 100).toFixed(2)}%`;
+                } else if (rawGrow) {
+                    totalGrowStr = String(rawGrow);
+                }
+
                 return {
-                    date: item["日期"] || item.date,
+                    date: dateStr,
                     value: Number(item["總值"]) || Number(item.value) || 0,
                     dailyGrow: item["當日成長"] || item.dailyGrow || "0%",
-                    totalGrow: item["累積成長"] || item.totalGrow || "0%",
+                    totalGrow: totalGrowStr,
                     annualized: item["年化報酬率"] || item.annualized || "0%"
                 };
             }).filter(item => item !== null);

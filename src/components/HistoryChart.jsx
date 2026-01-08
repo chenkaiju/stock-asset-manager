@@ -44,7 +44,6 @@ export const HistoryChart = ({ historyData }) => {
                                 axisLine={false}
                                 tickLine={false}
                                 tickMargin={10}
-                                tickFormatter={(str) => str.split('T')[0]}
                             />
                             <YAxis
                                 tick={{ fill: '#737373', fontSize: 12 }}
