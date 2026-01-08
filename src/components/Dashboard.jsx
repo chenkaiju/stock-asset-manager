@@ -11,8 +11,8 @@ export const Dashboard = ({ data, totalValue }) => {
                 <div className="absolute top-0 right-0 p-32 bg-blue-500/10 blur-3xl rounded-full translate-x-12 -translate-y-12"></div>
 
                 <div className="relative z-10 flex flex-col justify-between h-full space-y-4 md:space-y-0">
-                    <div className="flex justify-between items-start w-full">
-                        <p className="text-blue-300 font-medium text-sm flex items-center gap-2 pt-1">
+                    <div className="flex justify-between items-center w-full">
+                        <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
                             <Icons.Wallet size={16} /> 總資產估值
                         </p>
 
