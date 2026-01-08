@@ -115,16 +115,16 @@ export const useStockData = () => {
                 // Handle Date Format (YYYY-MM-DD)
                 let dateStr = "Unknown";
                 const rawDate = item["日期"] || item.date;
-                if (rawDate instanceof Date) {
-                    // Use Taiwan time for date consistency
-                    dateStr = rawDate.toLocaleDateString('zh-TW', {
-                        timeZone: 'Asia/Taipei',
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit'
-                    }).replace(/\//g, '-'); // Format: YYYY-MM-DD
-                } else if (typeof rawDate === 'string') {
-                    dateStr = rawDate.split('T')[0];
+                if (rawDate) {
+                    const dateObj = rawDate instanceof Date ? rawDate : new Date(rawDate);
+                    if (!isNaN(dateObj.getTime())) {
+                        dateStr = dateObj.toLocaleDateString('zh-TW', {
+                            timeZone: 'Asia/Taipei',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        }).replace(/\//g, '-');
+                    }
                 }
 
                 // Handle Growth Percentage
