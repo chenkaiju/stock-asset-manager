@@ -6,43 +6,29 @@ export const Dashboard = ({ data, totalValue }) => {
     return (
         <div className="space-y-6">
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div
-                    className="p-6 md:p-8 bg-gradient-to-br from-blue-900/40 to-slate-900/40 rounded-3xl border border-blue-500/20 backdrop-blur-sm relative overflow-hidden"
-                >
-                    <div className="absolute top-0 right-0 p-32 bg-blue-500/10 blur-3xl rounded-full translate-x-12 -translate-y-12"></div>
-                    <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
-                        <Icons.Wallet size={16} /> 總資產估值
-                    </p>
-                    <h3 className="text-3xl md:text-5xl font-bold mt-4 tracking-tight text-white">{formatCurrency(totalValue)}</h3>
-                    <div className="flex items-center space-x-2 mt-4 text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-400/20">
-                        <Icons.ArrowUpRight size={14} />
-                        <span>2.4% 今日上漲</span>
-                    </div>
-                </div>
+            {/* Summary Card - Single Full Width */}
+            <div className="relative p-6 md:p-8 bg-gradient-to-br from-blue-900/40 to-slate-900/40 rounded-3xl border border-blue-500/20 backdrop-blur-sm overflow-hidden">
+                <div className="absolute top-0 right-0 p-32 bg-blue-500/10 blur-3xl rounded-full translate-x-12 -translate-y-12"></div>
 
-                <div
-                    className="p-6 md:p-8 bg-neutral-900/30 rounded-3xl border border-white/5 backdrop-blur-sm flex flex-col justify-between"
-                >
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                     <div>
-                        <p className="text-neutral-400 font-medium text-sm">持股檔數</p>
-                        <h3 className="text-3xl md:text-4xl font-bold mt-2 tracking-tight">{data.length} <span className="text-lg text-neutral-500">檔</span></h3>
+                        <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
+                            <Icons.Wallet size={16} /> 總資產估值
+                        </p>
+                        <h3 className="text-4xl md:text-6xl font-bold mt-4 tracking-tight text-white">
+                            {formatCurrency(totalValue)}
+                        </h3>
+                        <div className="flex items-center space-x-2 mt-4 text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-400/20">
+                            <Icons.ArrowUpRight size={14} />
+                            <span>2.4% 今日上漲</span>
+                        </div>
                     </div>
-                    <div className="flex -space-x-3 mt-4">
-                        {[1, 2, 3].map(i => {
-                            const stock = data[i - 1];
-                            if (!stock) return null;
-                            return (
-                                <div key={i} className="w-10 h-10 rounded-full bg-neutral-800 border-2 border-[#0a0a0a] flex items-center justify-center text-xs font-bold text-neutral-300 shadow-lg">
-                                    {stock.股票名稱?.[0] || '?'}
-                                </div>
-                            );
-                        })}
-                        {data.length > 3 && (
-                            <div className="w-10 h-10 rounded-full bg-neutral-900 border-2 border-[#0a0a0a] flex items-center justify-center text-xs text-neutral-500">
-                                +{data.length - 3}
-                            </div>
-                        )}
+
+                    <div className="bg-white/5 px-5 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
+                        <p className="text-neutral-400 text-xs mb-1">持股數量</p>
+                        <p className="text-2xl font-bold text-white leading-none">
+                            {data.length} <span className="text-sm text-neutral-500 font-normal">檔</span>
+                        </p>
                     </div>
                 </div>
             </div>
