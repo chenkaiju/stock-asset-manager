@@ -29,8 +29,8 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                         : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
                         }`}
                 >
-                    <Icons.TrendingUp size={20} className="md:w-6 md:h-6" />
-                    <span className="text-[10px] md:text-base font-medium">歷史走勢</span>
+                    <Icons.BarChart3 size={20} className="md:w-6 md:h-6" />
+                    <span className="text-[10px] md:text-base font-medium">趨勢分析</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('list')}

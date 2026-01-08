@@ -136,7 +136,10 @@ export const useStockData = () => {
                     value: Number(item["總值"]) || Number(item.value) || 0,
                     dailyGrow: item["當日成長"] || item.dailyGrow || "0%",
                     totalGrow: totalGrowStr,
-                    annualized: item["年化報酬率"] || item.annualized || "0%"
+                    annualized: item["年化報酬率"] || item.annualized || "0%",
+                    drawdown: Number(item["回撤幅度"] || item.drawdown || 0),
+                    sharpe: Number(item["夏普比率"] || item.sharpe || 0),
+                    volatility: Number(item["年化波動率"] || item.volatility || 0)
                 };
             }).filter(item => item !== null && item.value > 0);
 

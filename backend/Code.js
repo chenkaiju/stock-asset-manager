@@ -31,15 +31,21 @@ function doGet() {
         const headers = values[0];
         const lastRow = values[values.length - 1];
 
-        // 1. History (slimmed for chart)
+        // 1. History (slimmed for charts)
         const dateIdx = headers.indexOf("日期");
         const valueIdx = headers.indexOf("總值");
         const growIdx = headers.indexOf("累積成長");
+        const drawdownIdx = headers.indexOf("回撤幅度");
+        const sharpeIdx = headers.indexOf("夏普比率");
+        const volIdx = headers.indexOf("年化波動率");
 
         const history = values.slice(1).map(row => ({
             date: row[dateIdx],
             value: row[valueIdx],
-            totalGrow: row[growIdx]
+            totalGrow: row[growIdx],
+            drawdown: row[drawdownIdx],
+            sharpe: row[sharpeIdx],
+            volatility: row[volIdx]
         }));
 
         // 2. Latest Stats (all metrics from the very last row)
