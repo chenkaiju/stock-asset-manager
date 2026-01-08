@@ -3,10 +3,15 @@ import { Icons } from './Icons';
 import { formatCurrency } from '../utils/formatters';
 
 export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
-    // Calculate Today's Change based on most recent historical value
-    const lastHistoryValue = (historyData && historyData.length > 0)
-        ? historyData[historyData.length - 1].value
-        : totalValue;
+    // Calculate Today's Change based on most recent historical value before today
+    const todayStr = new Date().toISOString().split('T')[0];
+    const candidates = historyData && historyData.length > 0
+        ? historyData.filter(h => h.date < todayStr)
+        : [];
+
+    const lastHistoryValue = candidates.length > 0
+        ? candidates[candidates.length - 1].value
+        : (historyData && historyData.length > 0 ? historyData[0].value : totalValue);
 
     const todayChange = totalValue - lastHistoryValue;
     const todayChangePercent = lastHistoryValue !== 0 ? (todayChange / lastHistoryValue) * 100 : 0;
