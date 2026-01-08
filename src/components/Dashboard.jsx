@@ -10,25 +10,28 @@ export const Dashboard = ({ data, totalValue }) => {
             <div className="relative p-6 md:p-8 bg-gradient-to-br from-blue-900/40 to-slate-900/40 rounded-3xl border border-blue-500/20 backdrop-blur-sm overflow-hidden">
                 <div className="absolute top-0 right-0 p-32 bg-blue-500/10 blur-3xl rounded-full translate-x-12 -translate-y-12"></div>
 
-                <div className="relative z-10">
-                    <div>
-                        <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
+                <div className="relative z-10 flex flex-col justify-between h-full space-y-4 md:space-y-0">
+                    <div className="flex justify-between items-start w-full">
+                        <p className="text-blue-300 font-medium text-sm flex items-center gap-2 pt-1">
                             <Icons.Wallet size={16} /> 總資產估值
                         </p>
-                        <h3 className="text-4xl md:text-6xl font-bold mt-4 tracking-tight text-white">
-                            {formatCurrency(totalValue)}
-                        </h3>
-                        <div className="flex items-center space-x-2 mt-4 text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-400/20">
-                            <Icons.ArrowUpRight size={14} />
-                            <span>2.4% 今日上漲</span>
+
+                        <div className="bg-white/5 px-4 py-2 rounded-xl border border-white/5 backdrop-blur-md">
+                            <p className="text-neutral-400 text-[10px] mb-0.5">持股</p>
+                            <p className="text-xl font-bold text-white leading-none">
+                                {data.length} <span className="text-xs text-neutral-500 font-normal">檔</span>
+                            </p>
                         </div>
                     </div>
 
-                    <div className="absolute top-6 right-6 bg-white/5 px-4 py-2 rounded-xl border border-white/5 backdrop-blur-md">
-                        <p className="text-neutral-400 text-[10px] mb-0.5">持股</p>
-                        <p className="text-xl font-bold text-white leading-none">
-                            {data.length} <span className="text-xs text-neutral-500 font-normal">檔</span>
-                        </p>
+                    <div>
+                        <h3 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-2">
+                            {formatCurrency(totalValue)}
+                        </h3>
+                        <div className="flex items-center space-x-2 text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-400/20">
+                            <Icons.ArrowUpRight size={14} />
+                            <span>2.4% 今日上漲</span>
+                        </div>
                     </div>
                 </div>
             </div>
