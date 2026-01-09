@@ -135,14 +135,35 @@ export const useStockData = () => {
 
         // 2. Fetch Public Data (Market Index & Exchange Rates) - Independent of Sheet URL
         try {
+            // Helper for proxy fetching with fallback
+            const fetchWithProxy = async (targetUrl) => {
+                const encodedUrl = encodeURIComponent(targetUrl);
+
+                // Try Primary Proxy (corsproxy.io)
+                try {
+                    const res = await fetch(`https://corsproxy.io/?${encodedUrl}`);
+                    if (!res.ok) throw new Error('Proxy 1 failed');
+                    return await res.json();
+                } catch (e1) {
+                    console.warn('Primary proxy failed, trying backup...', e1);
+                    // Try Backup Proxy (allorigins.win)
+                    try {
+                        const res = await fetch(`https://api.allorigins.win/get?url=${encodedUrl}`);
+                        if (!res.ok) throw new Error('Proxy 2 failed');
+                        const json = await res.json();
+                        return JSON.parse(json.contents);
+                    } catch (e2) {
+                        throw new Error(`All proxies failed for ${targetUrl}`);
+                    }
+                }
+            };
+
             // Fetch Market Data (TAIEX)
             try {
-                const proxyUrl = 'https://api.allorigins.win/get?url=';
-                const targetUrl = encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d');
-                const marketRes = await fetch(`${proxyUrl}${targetUrl}`);
-                const marketJson = await marketRes.json();
-                const marketDataObj = JSON.parse(marketJson.contents);
-                const result = marketDataObj.chart?.result?.[0];
+                const targetUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d';
+                const dataObj = await fetchWithProxy(targetUrl);
+                const result = dataObj.chart?.result?.[0];
+
                 if (result) {
                     const meta = result.meta;
                     const price = Number(meta.regularMarketPrice);
@@ -171,17 +192,10 @@ export const useStockData = () => {
             try {
                 await Promise.all(currencies.map(async (symbol) => {
                     try {
-                        // Add timestamp to prevent caching
                         const timestamp = new Date().getTime();
-                        const proxyUrl = 'https://api.allorigins.win/get?url=';
-                        const targetUrl = encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`);
+                        const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`;
 
-                        const res = await fetch(`${proxyUrl}${targetUrl}`);
-                        const json = await res.json();
-
-                        if (!json.contents) throw new Error("No contents");
-
-                        const dataObj = JSON.parse(json.contents);
+                        const dataObj = await fetchWithProxy(targetUrl);
                         const result = dataObj.chart?.result?.[0];
 
                         if (result) {
@@ -192,8 +206,6 @@ export const useStockData = () => {
                             if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
                                 const change = price - prevClose;
                                 const percent = (change / prevClose) * 100;
-
-                                // Map symbol to currency code
                                 const code = symbol.replace('TWD=X', '');
                                 ratesData[code] = {
                                     price,
