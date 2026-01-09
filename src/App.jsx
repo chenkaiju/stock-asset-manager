@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
@@ -7,6 +7,8 @@ import { HistoryChart } from './components/HistoryChart';
 import { DataSource } from './components/DataSource';
 import { PerformanceStats } from './components/PerformanceStats';
 import { ExchangeRates } from './components/ExchangeRates';
+import { MacroInsights } from './components/MacroInsights';
+import { TrendAnalysis } from './components/TrendAnalysis'; // Assuming this component is also needed based on the snippet
 import { useStockData } from './hooks/useStockData';
 
 export default function App() {
@@ -25,6 +27,37 @@ export default function App() {
     refresh
   } = useStockData();
 
+  // Setup periodic refresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refresh();
+    }, 60000); // Refresh every minute
+    return () => clearInterval(interval);
+  }, [refresh]);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} />;
+      case 'stocks': // Renamed from 'list'
+        return <StockList data={data} />;
+      case 'history': // Existing tab
+        return <HistoryChart historyData={historyData} />;
+      case 'performance': // Existing tab
+        return <PerformanceStats stats={performanceStats} />;
+      case 'analysis': // New tab
+        return <TrendAnalysis history={historyData} stats={performanceStats} />;
+      case 'rates': // Renamed from 'exchangerates'
+        return <ExchangeRates rates={exchangeRates} loading={loading} />;
+      case 'macro': // New tab
+        return <MacroInsights />;
+      case 'datasource': // Existing tab, renamed to 'settings' in snippet but keeping original for now
+        return <DataSource sheetUrl={sheetUrl} setSheetUrl={setSheetUrl} loading={loading} error={error} refresh={refresh} />;
+      default:
+        return <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-24 md:pb-0 md:pl-64 font-sans">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -37,35 +70,7 @@ export default function App() {
           error={error}
         />
 
-        {activeTab === 'dashboard' && (
-          <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} />
-        )}
-
-        {activeTab === 'history' && (
-          <HistoryChart historyData={historyData} />
-        )}
-
-        {activeTab === 'list' && (
-          <StockList data={data} />
-        )}
-
-        {activeTab === 'datasource' && (
-          <DataSource
-            sheetUrl={sheetUrl}
-            setSheetUrl={setSheetUrl}
-            error={error}
-            loading={loading}
-            refresh={refresh}
-          />
-        )}
-
-        {activeTab === 'performance' && (
-          <PerformanceStats stats={performanceStats} />
-        )}
-
-        {activeTab === 'exchangerates' && (
-          <ExchangeRates rates={exchangeRates} loading={loading} />
-        )}
+        {renderContent()}
       </main>
     </div>
   );

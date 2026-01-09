@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { fetchWithProxy } from '../utils/api';
 
 // Mock Data
 const MOCK_DATA = [
@@ -135,29 +136,6 @@ export const useStockData = () => {
 
         // 2. Fetch Public Data (Market Index & Exchange Rates) - Independent of Sheet URL
         try {
-            // Helper for proxy fetching with fallback
-            const fetchWithProxy = async (targetUrl) => {
-                const encodedUrl = encodeURIComponent(targetUrl);
-
-                // Try Primary Proxy (corsproxy.io)
-                try {
-                    const res = await fetch(`https://corsproxy.io/?${encodedUrl}`);
-                    if (!res.ok) throw new Error('Proxy 1 failed');
-                    return await res.json();
-                } catch (e1) {
-                    console.warn('Primary proxy failed, trying backup...', e1);
-                    // Try Backup Proxy (allorigins.win)
-                    try {
-                        const res = await fetch(`https://api.allorigins.win/get?url=${encodedUrl}`);
-                        if (!res.ok) throw new Error('Proxy 2 failed');
-                        const json = await res.json();
-                        return JSON.parse(json.contents);
-                    } catch (e2) {
-                        throw new Error(`All proxies failed for ${targetUrl}`);
-                    }
-                }
-            };
-
             // Fetch Market Data (TAIEX)
             try {
                 const targetUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d';
