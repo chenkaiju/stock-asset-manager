@@ -3,11 +3,58 @@ import { Icons } from './Icons';
 import { formatCurrency } from '../utils/formatters';
 
 export const StockList = ({ data }) => {
+    const [sortConfig, setSortConfig] = React.useState({ key: '代號', direction: 'asc' });
+
+    const handleSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const sortedData = React.useMemo(() => {
+        if (!data) return [];
+        return [...data].sort((a, b) => {
+            const aValue = a[sortConfig.key];
+            const bValue = b[sortConfig.key];
+
+            if (aValue < bValue) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+    }, [data, sortConfig]);
+
+    const SortIcon = ({ columnKey }) => {
+        if (sortConfig.key !== columnKey) return <div className="w-4 h-4" />; // Placeholder
+        return sortConfig.direction === 'asc'
+            ? <Icons.ArrowUp size={14} className="text-blue-400" />
+            : <Icons.ArrowDown size={14} className="text-blue-400" />;
+    };
+
+    // Sortable Header Component
+    const SortableHeader = ({ label, sortKey, align = "left" }) => (
+        <th
+            className={`px-6 py-4 font-medium cursor-pointer hover:text-white transition-colors select-none ${align === "right" ? "text-right" : "text-left"}`}
+            onClick={() => handleSort(sortKey)}
+        >
+            <div className={`flex items-center gap-1 ${align === "right" ? "justify-end" : "justify-start"}`}>
+                {label}
+                <SortIcon columnKey={sortKey} />
+            </div>
+        </th>
+    );
+
     return (
         <div className="pb-8">
-            {/* Mobile Card View */}
+            {/* Mobile Card View (Sorted) */}
             <div className="grid grid-cols-1 gap-3 md:hidden">
-                {data.map((stock) => (
+                {/* Mobile Sort Controls could go here if needed, for now just use sorted data */}
+                {sortedData.map((stock) => (
                     <div key={stock.代號} className="bg-neutral-900/30 p-4 rounded-2xl border border-white/5 space-y-3">
                         <div className="flex justify-between items-start">
                             <div className="flex items-center gap-3">
@@ -44,15 +91,27 @@ export const StockList = ({ data }) => {
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-white/5 text-neutral-400 text-sm">
-                            <th className="px-6 py-4 font-medium">名稱 / 代號</th>
-                            <th className="px-6 py-4 font-medium">持有股數</th>
-                            <th className="px-6 py-4 font-medium">目前股價</th>
-                            <th className="px-6 py-4 font-medium text-right">總市值</th>
+                            <th
+                                className="px-6 py-4 font-medium cursor-pointer hover:text-white transition-colors select-none"
+                                onClick={() => handleSort(sortConfig.key === '代號' ? '股票名稱' : '代號')}
+                            >
+                                <div className="flex items-center gap-1">
+                                    名稱 / 代號
+                                    {(sortConfig.key === '代號' || sortConfig.key === '股票名稱') && (
+                                        sortConfig.direction === 'asc'
+                                            ? <Icons.ArrowUp size={14} className="text-blue-400" />
+                                            : <Icons.ArrowDown size={14} className="text-blue-400" />
+                                    )}
+                                </div>
+                            </th>
+                            <SortableHeader label="持有股數" sortKey="股數" />
+                            <SortableHeader label="目前股價" sortKey="現價" />
+                            <SortableHeader label="總市值" sortKey="市值" align="right" />
                             <th className="px-6 py-4"></th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                        {data.map((stock) => (
+                        {sortedData.map((stock) => (
                             <tr key={stock.代號} className="hover:bg-white/5 transition-colors group">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
