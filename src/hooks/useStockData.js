@@ -154,37 +154,61 @@ export const useStockData = () => {
             setHistoryData(normalizedHistory);
             setPerformanceStats(rawStats);
 
-            // Fetch Exchange Rates (Parallel)
+            // Fetch Exchange Rates (Parallel with individual error handling)
             const currencies = ['USDTWD=X', 'EURTWD=X', 'JPYTWD=X', 'CNYTWD=X'];
-            const ratesData = {};
 
             try {
-                await Promise.all(currencies.map(async (symbol) => {
-                    const proxyUrl = 'https://api.allorigins.win/get?url=';
-                    const targetUrl = encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`);
-                    const res = await fetch(`${proxyUrl}${targetUrl}`);
-                    const json = await res.json();
-                    const dataObj = JSON.parse(json.contents);
-                    const result = dataObj.chart?.result?.[0];
-                    if (result) {
-                        const meta = result.meta;
-                        const price = Number(meta.regularMarketPrice);
-                        const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+                // Execute all fetches, catching errors individually so one failure doesn't break the rest
+                const results = await Promise.all(currencies.map(async (symbol) => {
+                    try {
+                        // Add timestamp to prevent caching
+                        const timestamp = new Date().getTime();
+                        const proxyUrl = 'https://api.allorigins.win/get?url=';
+                        const targetUrl = encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`);
 
-                        if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
-                            const change = price - prevClose;
-                            const percent = (change / prevClose) * 100;
+                        const res = await fetch(`${proxyUrl}${targetUrl}`);
+                        const json = await res.json();
 
-                            // Map symbol to currency code
-                            const code = symbol.replace('TWD=X', '');
-                            ratesData[code] = {
-                                price,
-                                change: parseFloat(change.toFixed(4)),
-                                percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
-                            };
+                        if (!json.contents) throw new Error("No contents");
+
+                        const dataObj = JSON.parse(json.contents);
+                        const result = dataObj.chart?.result?.[0];
+
+                        if (result) {
+                            const meta = result.meta;
+                            const price = Number(meta.regularMarketPrice);
+                            const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+
+                            if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
+                                const change = price - prevClose;
+                                const percent = (change / prevClose) * 100;
+
+                                // Map symbol to currency code
+                                const code = symbol.replace('TWD=X', '');
+                                return {
+                                    code,
+                                    data: {
+                                        price,
+                                        change: parseFloat(change.toFixed(4)),
+                                        percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
+                                    }
+                                };
+                            }
                         }
+                    } catch (e) {
+                        console.warn(`Failed to fetch rate for ${symbol}:`, e);
                     }
+                    return null;
                 }));
+
+                // Aggregate valid results
+                const ratesData = {};
+                results.forEach(item => {
+                    if (item) {
+                        ratesData[item.code] = item.data;
+                    }
+                });
+
                 setExchangeRates(ratesData);
             } catch (rateErr) {
                 console.error("Exchange rate fetch error:", rateErr);
