@@ -121,13 +121,7 @@ export const PerformanceStats = ({ stats }) => {
                         color="bg-purple-500"
                         description="資產價格變動的劇烈程度。"
                     />
-                    <MetricCard
-                        title="下行差額"
-                        value={stats["下行差額"]}
-                        icon={Icons.Shield}
-                        color="bg-slate-500"
-                        description="衡量資產下跌時的波動程度。"
-                    />
+
                 </div>
             </section>
 
