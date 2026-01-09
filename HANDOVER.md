@@ -36,25 +36,27 @@
 
 ### **已完成功能 (Completed)**
 1.  **Dashboard**：總資產概覽、今日漲跌（與昨日歷史數據比較，修正時區問題）。
-2.  **匯率資訊 (Exchange Rates)**：[NEW] 顯示 USD, EUR, JPY, CNY 兌台幣即時匯率（含防快取機制）。
-3.  **持股清單 (Stock List)**：[NEW] 支援點擊標題依照代碼、名稱、股數、股價、市值排序。
+2.  **匯率資訊 (Exchange Rates)**：[NEW] 顯示 USD, EUR, JPY, CNY 兌台幣即時匯率（含國旗圖示）。
+3.  **持股清單 (Stock List)**：
+    *   桌機版：點擊標題依照代碼、名稱、股數、股價、市值排序。
+    *   手機版：[NEW] 透過上方按鈕 (Chips) 快速排序。
 4.  **趨勢分析 (Trend Analysis)**：資產走勢、Drawdown、Sharp/Volatility 圖表。
-5.  **績效分析 (Performance)**：[UPDATED] 精簡化介面，移除圖示，優化字體大小與數值顯示。
-6.  **資料來源頁面**：獨立管理 GAS 連線（已移至選單最下方）。
+5.  **績效分析 (Performance)**：數值預設顯示 `--` 防止版面空白。
+6.  **總經觀察 (Macro Insights)**：[NEW] S&P 500 (Yahoo) vs M2 (FRED) 雙軸圖表，支援 API Key 設定。
+7.  **資料來源頁面**：獨立管理 GAS 連線。
 
 ### **最近變更 (Recent Changes)**
--   **Feat**: 新增匯率頁面，使用 Yahoo Finance Proxy 抓取並支援個別錯誤處理。
--   **Feat**: 實作持股清單多欄位排序功能。
--   **Fix**: 修正前後端日期計算邏輯，統一轉為 Asia/Taipei 格式，解決每日變化計算錯誤。
--   **Style**: 移除績效分析卡片圖示，調整字級層級 (Title大/Value小)。
+-   **Feat**: 新增「總經觀察」頁面，整合 FRED API (M2) 與 Yahoo Finance (SP500)。
+-   **Feat**: 實作手機版持股清單排序功能。
+-   **Refactor**: 重構公開數據 (匯率/大盤) 抓取邏輯，實作 `api.allorigins.win` 與 `corsproxy.io` 自動備援切換，並不依賴 Sheet URL。
+-   **Style**: 匯率頁面圖示改為國旗 (flagcdn.com)。
 
 ### **待辦事項 (Pending/Next Steps)**
--   目前沒有待辦事項。
+-   無。
 
 ---
 
 ## 🛠️ 維護紀錄
--   修正了 `Icons.Info` 缺失導致的渲染崩潰。
--   優化了 TAIEX 數據抓取邏輯，解決 `NaN` 錯誤。
--   將夏普比率改為數值顯示（非百分比）。
+-   `src/utils/api.js` 封裝了 `fetchWithProxy`，未來所有跨域請求應使用此工具。
+-   FRED API Key 支援 `.env` (Vercel) 或 `localStorage` (舊版相容)。
 -   後端 `Code.js` 需確保回傳日期已格式化為 "yyyy-MM-dd" 字串。
