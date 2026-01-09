@@ -16,6 +16,27 @@ export const MacroInsights = () => {
                 return;
             }
 
+            // Check Cache
+            const CACHE_KEY = 'macroData_v1';
+            const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+            const cached = localStorage.getItem(CACHE_KEY);
+
+            if (cached) {
+                try {
+                    const { timestamp, data: cachedData } = JSON.parse(cached);
+                    const now = new Date().getTime();
+                    if (now - timestamp < CACHE_DURATION && cachedData.length > 0) {
+                        console.log("Using cached macro data");
+                        setData(cachedData);
+                        setLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Cache parse error", e);
+                    localStorage.removeItem(CACHE_KEY);
+                }
+            }
+
             setLoading(true);
             setError(null);
 
@@ -90,6 +111,12 @@ export const MacroInsights = () => {
                 });
 
                 setData(mergedData);
+
+                // Save to Cache
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                    timestamp: new Date().getTime(),
+                    data: mergedData
+                }));
 
             } catch (err) {
                 console.error("Macro data error:", err);
