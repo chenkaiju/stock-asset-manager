@@ -27,7 +27,7 @@ export const PerformanceStats = ({ stats }) => {
     const MetricCard = ({ title, value, unit, description, isPercent = false, precision = 2 }) => (
         <div className="p-5 bg-neutral-900/30 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
             <div className="flex justify-between items-start mb-2">
-                <h4 className="text-sm font-bold text-neutral-400 uppercase tracking-widest">{title}</h4>
+                <h4 className="text-base font-bold text-neutral-400 uppercase tracking-widest">{title}</h4>
                 {description && (
                     <div className="group relative">
                         <Icons.Info size={14} className="text-neutral-600 cursor-help" />
@@ -38,7 +38,7 @@ export const PerformanceStats = ({ stats }) => {
                 )}
             </div>
             <div className="flex items-baseline gap-1 mt-1">
-                <h4 className="text-3xl font-bold text-white tabular-nums tracking-tight">
+                <h4 className="text-2xl font-bold text-white tabular-nums tracking-tight">
                     {isPercent ? formatVal(value, 'percent') : formatVal(value, 'number', precision)}
                 </h4>
                 {unit && <span className="text-xs text-neutral-500">{unit}</span>}
