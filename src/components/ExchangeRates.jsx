@@ -12,10 +12,10 @@ export const ExchangeRates = ({ rates, loading }) => {
     }
 
     const currencies = [
-        { code: 'USD', name: '美金', icon: '$' },
-        { code: 'EUR', name: '歐元', icon: '€' },
-        { code: 'JPY', name: '日圓', icon: '¥' },
-        { code: 'CNY', name: '人民幣', icon: '¥' },
+        { code: 'USD', name: '美金', flag: 'us' },
+        { code: 'EUR', name: '歐元', flag: 'eu' },
+        { code: 'JPY', name: '日圓', flag: 'jp' },
+        { code: 'CNY', name: '人民幣', flag: 'cn' },
     ];
 
     return (
@@ -44,8 +44,12 @@ export const ExchangeRates = ({ rates, loading }) => {
                         <div key={currency.code} className="p-6 bg-neutral-900/30 rounded-3xl border border-white/5 hover:border-white/10 transition-all group">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center text-lg font-bold text-neutral-300">
-                                        {currency.icon}
+                                    <div className="w-10 h-10 rounded-full bg-neutral-800 overflow-hidden border-2 border-neutral-700/50 flex-shrink-0">
+                                        <img
+                                            src={`https://flagcdn.com/w80/${currency.flag}.png`}
+                                            alt={currency.name}
+                                            className="w-full h-full object-cover"
+                                        />
                                     </div>
                                     <div>
                                         <div className="font-bold text-lg">{currency.code}</div>
