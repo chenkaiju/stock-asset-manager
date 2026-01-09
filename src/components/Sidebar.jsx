@@ -11,10 +11,10 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                 <p className="text-xs text-neutral-500 mt-2 pl-1">Stock Portfolio Tracker</p>
             </div>
 
-            <div className="flex justify-around md:flex-col md:space-y-2">
+            <div className="flex overflow-x-auto md:overflow-visible justify-start md:justify-start gap-2 md:gap-0 md:space-y-2 no-scrollbar px-2 md:px-0 md:flex-col">
                 <button
                     onClick={() => setActiveTab('dashboard')}
-                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'dashboard'
+                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'dashboard'
                         ? 'text-blue-400 bg-blue-400/10'
                         : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
                         }`}
@@ -24,7 +24,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                 </button>
                 <button
                     onClick={() => setActiveTab('history')}
-                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'history'
+                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'history'
                         ? 'text-blue-400 bg-blue-400/10'
                         : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
                         }`}
@@ -34,7 +34,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                 </button>
                 <button
                     onClick={() => setActiveTab('list')}
-                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'list'
+                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'list'
                         ? 'text-blue-400 bg-blue-400/10'
                         : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
                         }`}
@@ -45,7 +45,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
 
                 <button
                     onClick={() => setActiveTab('performance')}
-                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'performance'
+                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'performance'
                         ? 'text-blue-400 bg-blue-400/10'
                         : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
                         }`}
@@ -55,7 +55,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                 </button>
                 <button
                     onClick={() => setActiveTab('exchangerates')}
-                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'exchangerates'
+                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'exchangerates'
                         ? 'text-blue-400 bg-blue-400/10'
                         : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
                         }`}
@@ -65,7 +65,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                 </button>
                 <button
                     onClick={() => setActiveTab('macro')}
-                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'macro'
+                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'macro'
                         ? 'text-blue-400 bg-blue-400/10'
                         : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
                         }`}
@@ -75,7 +75,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                 </button>
                 <button
                     onClick={() => setActiveTab('datasource')}
-                    className={`flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'datasource'
+                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'datasource'
                         ? 'text-blue-400 bg-blue-400/10'
                         : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
                         }`}

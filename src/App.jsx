@@ -8,7 +8,7 @@ import { DataSource } from './components/DataSource';
 import { PerformanceStats } from './components/PerformanceStats';
 import { ExchangeRates } from './components/ExchangeRates';
 import { MacroInsights } from './components/MacroInsights';
-import { TrendAnalysis } from './components/TrendAnalysis'; // Assuming this component is also needed based on the snippet
+
 import { useStockData } from './hooks/useStockData';
 
 export default function App() {
@@ -45,8 +45,7 @@ export default function App() {
         return <HistoryChart historyData={historyData} />;
       case 'performance': // Existing tab
         return <PerformanceStats stats={performanceStats} />;
-      case 'analysis': // New tab
-        return <TrendAnalysis history={historyData} stats={performanceStats} />;
+
       case 'rates': // Renamed from 'exchangerates'
         return <ExchangeRates rates={exchangeRates} loading={loading} />;
       case 'macro': // New tab
