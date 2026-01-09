@@ -46,13 +46,15 @@
 7.  **資料來源頁面**：獨立管理 GAS 連線。
 
 ### **最近變更 (Recent Changes)**
--   **Feat**: 新增「總經觀察」頁面，整合 FRED API (M2) 與 Yahoo Finance (SP500)。
--   **Feat**: 實作手機版持股清單排序功能。
--   **Refactor**: 重構公開數據 (匯率/大盤) 抓取邏輯，實作 `api.allorigins.win` 與 `corsproxy.io` 自動備援切換，並不依賴 Sheet URL。
+-   **Feat**: 新增「總經觀察」頁面，整合 FRED API (M2) 與 Yahoo Finance (SP500)，並實作 **24 小時快取 (LocalStorage)** 以優化效能。
+-   **Feat/Fix**: 手機版側邊欄支援橫向捲動，解決按鈕過多被遮擋的問題。
+-   **Fix**: 修正側邊欄「持股清單」與「匯率資訊」按鈕 ID 不對應導致跳轉錯誤的問題。
+-   **Fix**: 補上缺少的 React Icons (Key, AlertTriangle) 避免頁面崩潰。
+-   **Refactor**: 重構公開數據 (匯率/大盤) 抓取邏輯，實作 `api.allorigins.win` 與 `corsproxy.io` 自動備援切換。
 -   **Style**: 匯率頁面圖示改為國旗 (flagcdn.com)。
 
 ### **待辦事項 (Pending/Next Steps)**
--   無。
+-   [Optional] 將 FRED API Key 改為後端 Proxy 隱藏 (若有高安全性需求)。
 
 ---
 
