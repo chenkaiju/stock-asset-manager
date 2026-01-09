@@ -39,14 +39,22 @@ function doGet() {
         const sharpeIdx = headers.indexOf("夏普比率");
         const volIdx = headers.indexOf("年化波動率");
 
-        const history = values.slice(1).map(row => ({
-            date: row[dateIdx],
-            value: row[valueIdx],
-            totalGrow: row[growIdx],
-            drawdown: row[drawdownIdx],
-            sharpe: row[sharpeIdx],
-            volatility: row[volIdx]
-        }));
+        const history = values.slice(1).map(row => {
+            const dateVal = row[dateIdx];
+            // Format date to string to ensure consistency (YYYY-MM-DD)
+            const dateStr = (dateVal instanceof Date)
+                ? Utilities.formatDate(dateVal, Session.getScriptTimeZone(), "yyyy-MM-dd")
+                : dateVal;
+
+            return {
+                date: dateStr,
+                value: row[valueIdx],
+                totalGrow: row[growIdx],
+                drawdown: row[drawdownIdx],
+                sharpe: row[sharpeIdx],
+                volatility: row[volIdx]
+            };
+        });
 
         // 2. Latest Stats (all metrics from the very last row)
         const stats = {};
