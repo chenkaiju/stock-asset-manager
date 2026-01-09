@@ -24,6 +24,7 @@ export const useStockData = () => {
     const [sheetUrl, setSheetUrl] = useState(() => localStorage.getItem('sheetUrl') || '');
     const [error, setError] = useState(null);
     const [performanceStats, setPerformanceStats] = useState(null);
+    const [exchangeRates, setExchangeRates] = useState({});
 
     useEffect(() => {
         if (sheetUrl) {
@@ -152,6 +153,43 @@ export const useStockData = () => {
             setData(normalizedData);
             setHistoryData(normalizedHistory);
             setPerformanceStats(rawStats);
+
+            // Fetch Exchange Rates (Parallel)
+            const currencies = ['USDTWD=X', 'EURTWD=X', 'JPYTWD=X', 'CNYTWD=X'];
+            const ratesData = {};
+
+            try {
+                await Promise.all(currencies.map(async (symbol) => {
+                    const proxyUrl = 'https://api.allorigins.win/get?url=';
+                    const targetUrl = encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`);
+                    const res = await fetch(`${proxyUrl}${targetUrl}`);
+                    const json = await res.json();
+                    const dataObj = JSON.parse(json.contents);
+                    const result = dataObj.chart?.result?.[0];
+                    if (result) {
+                        const meta = result.meta;
+                        const price = Number(meta.regularMarketPrice);
+                        const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+
+                        if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
+                            const change = price - prevClose;
+                            const percent = (change / prevClose) * 100;
+
+                            // Map symbol to currency code
+                            const code = symbol.replace('TWD=X', '');
+                            ratesData[code] = {
+                                price,
+                                change: parseFloat(change.toFixed(4)),
+                                percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
+                            };
+                        }
+                    }
+                }));
+                setExchangeRates(ratesData);
+            } catch (rateErr) {
+                console.error("Exchange rate fetch error:", rateErr);
+            }
+
         } catch (err) {
             console.error("Fetch error:", err);
             // Only set error state if it's not a background refresh (to avoid annoying popups)
@@ -181,6 +219,7 @@ export const useStockData = () => {
         historyData,
         performanceStats,
         marketData,
+        exchangeRates,
         loading,
         error,
         sheetUrl,

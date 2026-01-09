@@ -6,6 +6,7 @@ import { StockList } from './components/StockList';
 import { HistoryChart } from './components/HistoryChart';
 import { DataSource } from './components/DataSource';
 import { PerformanceStats } from './components/PerformanceStats';
+import { ExchangeRates } from './components/ExchangeRates';
 import { useStockData } from './hooks/useStockData';
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
     historyData,
     performanceStats,
     marketData,
+    exchangeRates,
     loading,
     error,
     sheetUrl,
@@ -59,6 +61,10 @@ export default function App() {
 
         {activeTab === 'performance' && (
           <PerformanceStats stats={performanceStats} />
+        )}
+
+        {activeTab === 'exchangerates' && (
+          <ExchangeRates rates={exchangeRates} loading={loading} />
         )}
       </main>
     </div>
