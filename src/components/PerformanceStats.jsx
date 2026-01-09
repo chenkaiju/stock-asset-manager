@@ -2,15 +2,8 @@ import React from 'react';
 import { Icons } from './Icons';
 
 export const PerformanceStats = ({ stats }) => {
-    if (!stats) {
-        return (
-            <div className="flex flex-col items-center justify-center p-12 text-neutral-500 bg-neutral-900/30 rounded-3xl border border-white/5">
-                <Icons.Activity size={48} className="mb-4 opacity-50" />
-                <p>尚無績效統計數據</p>
-                <p className="text-xs mt-2 text-neutral-600">請確認 "歷史現值" 中是否已包含統計欄位</p>
-            </div>
-        );
-    }
+    // Use empty object if stats is missing to render layout with placeholders
+    const displayStats = stats || {};
 
     const formatVal = (val, type = 'number', precision = 2) => {
         if (val === undefined || val === null || val === '') return '--';
@@ -57,22 +50,22 @@ export const PerformanceStats = ({ stats }) => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <MetricCard
                         title="夏普比率"
-                        value={stats["夏普比率"]}
+                        value={displayStats["夏普比率"]}
                         description="每單位風險換來的超額回報。> 1 代表表現良好。"
                     />
                     <MetricCard
                         title="索提諾比率"
-                        value={stats["索提諾比率"]}
+                        value={displayStats["索提諾比率"]}
                         description="專注於下行風險的回報比。越高越好。"
                     />
                     <MetricCard
                         title="Calmar Ratio"
-                        value={stats["Calmar Ratio"]}
+                        value={displayStats["Calmar Ratio"]}
                         description="年化報酬與最大回撤的比值。"
                     />
                     <MetricCard
                         title="年化報酬率"
-                        value={stats["年化報酬率"]}
+                        value={displayStats["年化報酬率"]}
                         isPercent={true}
                         description="將波段報酬轉換為年度計算的收益率。"
                     />
@@ -88,14 +81,14 @@ export const PerformanceStats = ({ stats }) => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <MetricCard
                         title="最大回撤 (MDD)"
-                        value={stats["最大回撤 (MDD)"]}
+                        value={displayStats["最大回撤 (MDD)"]}
                         isPercent={true}
                         description="從歷史最高點回落的最大幅度。越小越安全。"
                     />
 
                     <MetricCard
                         title="年化波動率"
-                        value={stats["年化波動率"]}
+                        value={displayStats["年化波動率"]}
                         isPercent={true}
                         description="資產價格變動的劇烈程度。"
                     />
@@ -113,7 +106,7 @@ export const PerformanceStats = ({ stats }) => {
 
                     <MetricCard
                         title="歷史最高"
-                        value={stats["累計總值高峰"]}
+                        value={displayStats["累計總值高峰"]}
                         precision={0}
                         description="歷史上曾達到過的最高資產總額。"
                     />
