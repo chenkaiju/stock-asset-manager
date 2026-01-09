@@ -34,34 +34,108 @@ export const useStockData = () => {
 
     // Define fetchData with useCallback so it can be reused
     const fetchData = useCallback(async (isBackground = false) => {
-        if (!sheetUrl) return;
-
         // Only show full loading state if not a background refresh
         if (!isBackground) setLoading(true);
-
         setError(null);
-        try {
-            const response = await fetch(sheetUrl);
-            if (!response.ok) throw new Error('Failed to fetch data');
-            const jsonData = await response.json();
 
-            let rawStocks = [];
-            let rawHistory = [];
-            let rawStats = null; // Initialize rawStats
+        // 1. Fetch Private Data (Google Sheet)
+        if (sheetUrl) {
+            try {
+                const response = await fetch(sheetUrl);
+                if (!response.ok) throw new Error('Failed to fetch data');
+                const jsonData = await response.json();
 
-            if (Array.isArray(jsonData)) {
-                // Legacy support: The whole response is the stocks array
-                rawStocks = jsonData;
-            } else if (jsonData && (jsonData.stocks || jsonData.history || jsonData.stats)) {
-                // New format: Object with keys
-                rawStocks = jsonData.stocks || [];
-                rawHistory = jsonData.history || [];
-                rawStats = jsonData.stats || null; // Parse result.stats
-            } else {
-                throw new Error('Invalid data format: Expected array or object with stocks/history/stats');
+                let rawStocks = [];
+                let rawHistory = [];
+                let rawStats = null; // Initialize rawStats
+
+                if (Array.isArray(jsonData)) {
+                    // Legacy support: The whole response is the stocks array
+                    rawStocks = jsonData;
+                } else if (jsonData && (jsonData.stocks || jsonData.history || jsonData.stats)) {
+                    // New format: Object with keys
+                    rawStocks = jsonData.stocks || [];
+                    rawHistory = jsonData.history || [];
+                    rawStats = jsonData.stats || null; // Parse result.stats
+                } else {
+                    throw new Error('Invalid data format: Expected array or object with stocks/history/stats');
+                }
+
+                // Basic normalization to ensure numbers are numbers
+                const normalizedData = rawStocks.map(item => {
+                    if (!item) return null; // Safety check
+                    const quantity = Number(item["股數"]) || 0;
+                    const price = Number(item["股價"]) || 0; // User column: 股價
+                    const marketValue = Number(item["個股現值"]) || (quantity * price); // User column: 個股現值
+
+                    return {
+                        ...item,
+                        // Internal App Keys mapped from Sheet Columns
+                        "股票名稱": item["股名"] || item["股票名稱"] || "Unknown", // User column: 股名
+                        "代號": item["股票代碼"] || item["代號"] || "0000", // User column: 股票代碼
+                        "股數": quantity,
+                        "現價": price,
+                        "市值": marketValue,
+                    };
+                }).filter(item => item !== null); // Remove nulls
+
+
+                // Normalize History Data
+                const normalizedHistory = rawHistory.map(item => {
+                    if (!item) return null;
+
+                    // Handle Date Format (YYYY-MM-DD)
+                    let dateStr = "Unknown";
+                    const rawDate = item["日期"] || item.date;
+                    if (rawDate) {
+                        const dateObj = rawDate instanceof Date ? rawDate : new Date(rawDate);
+                        if (!isNaN(dateObj.getTime())) {
+                            dateStr = dateObj.toLocaleDateString('zh-TW', {
+                                timeZone: 'Asia/Taipei',
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit'
+                            }).replace(/\//g, '-');
+                        }
+                    }
+
+                    // Handle Growth Percentage
+                    let totalGrowStr = "0%";
+                    const rawGrow = item["累積成長"] || item.totalGrow;
+                    if (typeof rawGrow === 'number') {
+                        // Assuming number like 0.15 for 15%
+                        totalGrowStr = `${(rawGrow * 100).toFixed(2)}%`;
+                    } else if (rawGrow) {
+                        totalGrowStr = String(rawGrow);
+                    }
+
+                    return {
+                        date: dateStr,
+                        value: Number(item["總值"]) || Number(item.value) || 0,
+                        dailyGrow: item["當日成長"] || item.dailyGrow || "0%",
+                        totalGrow: totalGrowStr,
+                        annualized: item["年化報酬率"] || item.annualized || "0%",
+                        drawdown: Number(item["回撤幅度"] || item.drawdown || 0),
+                        sharpe: Number(item["夏普比率"] || item.sharpe || 0),
+                        volatility: Number(item["年化波動率"] || item.volatility || 0)
+                    };
+                }).filter(item => item !== null && item.value > 0);
+
+                setData(normalizedData);
+                setHistoryData(normalizedHistory);
+                setPerformanceStats(rawStats);
+            } catch (err) {
+                console.error("Fetch error:", err);
+                // Only set error state if it's not a background refresh (to avoid annoying popups)
+                if (!isBackground) {
+                    setError(err.message);
+                }
             }
+        }
 
-            // Fetch Market Data (TAIEX) Directly from Yahoo Finance via Proxy
+        // 2. Fetch Public Data (Market Index & Exchange Rates) - Independent of Sheet URL
+        try {
+            // Fetch Market Data (TAIEX)
             try {
                 const proxyUrl = 'https://api.allorigins.win/get?url=';
                 const targetUrl = encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d');
@@ -90,76 +164,12 @@ export const useStockData = () => {
                 console.error("Market fetch error:", mErr);
             }
 
-            // Basic normalization to ensure numbers are numbers
-            const normalizedData = rawStocks.map(item => {
-                if (!item) return null; // Safety check
-                const quantity = Number(item["股數"]) || 0;
-                const price = Number(item["股價"]) || 0; // User column: 股價
-                const marketValue = Number(item["個股現值"]) || (quantity * price); // User column: 個股現值
-
-                return {
-                    ...item,
-                    // Internal App Keys mapped from Sheet Columns
-                    "股票名稱": item["股名"] || item["股票名稱"] || "Unknown", // User column: 股名
-                    "代號": item["股票代碼"] || item["代號"] || "0000", // User column: 股票代碼
-                    "股數": quantity,
-                    "現價": price,
-                    "市值": marketValue,
-                };
-            }).filter(item => item !== null); // Remove nulls
-
-
-            // Normalize History Data
-            const normalizedHistory = rawHistory.map(item => {
-                if (!item) return null;
-
-                // Handle Date Format (YYYY-MM-DD)
-                let dateStr = "Unknown";
-                const rawDate = item["日期"] || item.date;
-                if (rawDate) {
-                    const dateObj = rawDate instanceof Date ? rawDate : new Date(rawDate);
-                    if (!isNaN(dateObj.getTime())) {
-                        dateStr = dateObj.toLocaleDateString('zh-TW', {
-                            timeZone: 'Asia/Taipei',
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit'
-                        }).replace(/\//g, '-');
-                    }
-                }
-
-                // Handle Growth Percentage
-                let totalGrowStr = "0%";
-                const rawGrow = item["累積成長"] || item.totalGrow;
-                if (typeof rawGrow === 'number') {
-                    // Assuming number like 0.15 for 15%
-                    totalGrowStr = `${(rawGrow * 100).toFixed(2)}%`;
-                } else if (rawGrow) {
-                    totalGrowStr = String(rawGrow);
-                }
-
-                return {
-                    date: dateStr,
-                    value: Number(item["總值"]) || Number(item.value) || 0,
-                    dailyGrow: item["當日成長"] || item.dailyGrow || "0%",
-                    totalGrow: totalGrowStr,
-                    annualized: item["年化報酬率"] || item.annualized || "0%",
-                    drawdown: Number(item["回撤幅度"] || item.drawdown || 0),
-                    sharpe: Number(item["夏普比率"] || item.sharpe || 0),
-                    volatility: Number(item["年化波動率"] || item.volatility || 0)
-                };
-            }).filter(item => item !== null && item.value > 0);
-
-            setData(normalizedData);
-            setHistoryData(normalizedHistory);
-            setPerformanceStats(rawStats);
-
-            // Fetch Exchange Rates (Parallel with individual error handling)
+            // Fetch Exchange Rates
             const currencies = ['USDTWD=X', 'EURTWD=X', 'JPYTWD=X', 'CNYTWD=X'];
+            const ratesData = {};
 
             try {
-                // Execute all fetches, catching errors individually so one failure doesn't break the rest
-                const results = await Promise.all(currencies.map(async (symbol) => {
+                await Promise.all(currencies.map(async (symbol) => {
                     try {
                         // Add timestamp to prevent caching
                         const timestamp = new Date().getTime();
@@ -185,13 +195,10 @@ export const useStockData = () => {
 
                                 // Map symbol to currency code
                                 const code = symbol.replace('TWD=X', '');
-                                return {
-                                    code,
-                                    data: {
-                                        price,
-                                        change: parseFloat(change.toFixed(4)),
-                                        percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
-                                    }
+                                ratesData[code] = {
+                                    price,
+                                    change: parseFloat(change.toFixed(4)),
+                                    percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
                                 };
                             }
                         }
@@ -201,29 +208,19 @@ export const useStockData = () => {
                     return null;
                 }));
 
-                // Aggregate valid results
-                const ratesData = {};
-                results.forEach(item => {
-                    if (item) {
-                        ratesData[item.code] = item.data;
-                    }
-                });
-
-                setExchangeRates(ratesData);
+                if (Object.keys(ratesData).length > 0) {
+                    setExchangeRates(ratesData);
+                }
             } catch (rateErr) {
                 console.error("Exchange rate fetch error:", rateErr);
             }
 
-        } catch (err) {
-            console.error("Fetch error:", err);
-            // Only set error state if it's not a background refresh (to avoid annoying popups)
-            if (!isBackground) {
-                setError(err.message);
-            }
+        } catch (publicErr) {
+            console.error("Public data fetch error:", publicErr);
         } finally {
             if (!isBackground) setLoading(false);
         }
-    }, [sheetUrl]); // Removed data dependency to avoid infinite loop
+    }, [sheetUrl]); // data dependency removed
 
     useEffect(() => {
         // Initial fetch
