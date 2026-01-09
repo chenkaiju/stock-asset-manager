@@ -105,14 +105,7 @@ export const PerformanceStats = ({ stats }) => {
                         color="bg-emerald-500"
                         description="從歷史最高點回落的最大幅度。越小越安全。"
                     />
-                    <MetricCard
-                        title="回撤幅度"
-                        value={stats["回撤幅度"]}
-                        isPercent={true}
-                        icon={Icons.ArrowDownRight}
-                        color="bg-emerald-400"
-                        description="目前資產處於水面下的百分比。"
-                    />
+
                     <MetricCard
                         title="年化波動率"
                         value={stats["年化波動率"]}
@@ -132,15 +125,9 @@ export const PerformanceStats = ({ stats }) => {
                     <h3 className="text-lg font-bold text-white">其他指標 (Other)</h3>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
                     <MetricCard
-                        title="日報酬率"
-                        value={stats["日報酬率"]}
-                        isPercent={true}
-                        icon={Icons.Percent}
-                        color="bg-red-400"
-                    />
-                    <MetricCard
-                        title="累積總值高峰"
+                        title="歷史最高"
                         value={stats["累計總值高峰"]}
                         icon={Icons.TrendingUp}
                         color="bg-blue-400"
