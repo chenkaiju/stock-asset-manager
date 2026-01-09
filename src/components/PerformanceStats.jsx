@@ -24,12 +24,10 @@ export const PerformanceStats = ({ stats }) => {
         return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
     };
 
-    const MetricCard = ({ title, value, unit, icon: Icon, color, description, isPercent = false }) => (
+    const MetricCard = ({ title, value, unit, description, isPercent = false }) => (
         <div className="p-5 bg-neutral-900/30 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
-            <div className="flex justify-between items-start mb-3">
-                <div className={`p-2 rounded-xl ${color} bg-opacity-10`}>
-                    <Icon size={18} className={color.replace('bg-', 'text-')} />
-                </div>
+            <div className="flex justify-between items-start mb-2">
+                <h4 className="text-sm font-bold text-neutral-400 uppercase tracking-widest">{title}</h4>
                 {description && (
                     <div className="group relative">
                         <Icons.Info size={14} className="text-neutral-600 cursor-help" />
@@ -39,9 +37,8 @@ export const PerformanceStats = ({ stats }) => {
                     </div>
                 )}
             </div>
-            <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider mb-1">{title}</p>
-            <div className="flex items-baseline gap-1">
-                <h4 className="text-xl font-bold text-white tabular-nums">
+            <div className="flex items-baseline gap-1 mt-1">
+                <h4 className="text-3xl font-bold text-white tabular-nums tracking-tight">
                     {isPercent ? formatVal(value, 'percent') : formatVal(value)}
                 </h4>
                 {unit && <span className="text-xs text-neutral-500">{unit}</span>}
@@ -61,30 +58,22 @@ export const PerformanceStats = ({ stats }) => {
                     <MetricCard
                         title="夏普比率"
                         value={stats["夏普比率"]}
-                        icon={Icons.Zap}
-                        color="bg-yellow-500"
                         description="每單位風險換來的超額回報。> 1 代表表現良好。"
                     />
                     <MetricCard
                         title="索提諾比率"
                         value={stats["索提諾比率"]}
-                        icon={Icons.Zap}
-                        color="bg-orange-500"
                         description="專注於下行風險的回報比。越高越好。"
                     />
                     <MetricCard
                         title="Calmar Ratio"
                         value={stats["Calmar Ratio"]}
-                        icon={Icons.Zap}
-                        color="bg-blue-500"
                         description="年化報酬與最大回撤的比值。"
                     />
                     <MetricCard
                         title="年化報酬率"
                         value={stats["年化報酬率"]}
                         isPercent={true}
-                        icon={Icons.TrendingUp}
-                        color="bg-red-500"
                         description="將波段報酬轉換為年度計算的收益率。"
                     />
                 </div>
@@ -101,8 +90,6 @@ export const PerformanceStats = ({ stats }) => {
                         title="最大回撤 (MDD)"
                         value={stats["最大回撤 (MDD)"]}
                         isPercent={true}
-                        icon={Icons.TrendingDown}
-                        color="bg-emerald-500"
                         description="從歷史最高點回落的最大幅度。越小越安全。"
                     />
 
@@ -110,8 +97,6 @@ export const PerformanceStats = ({ stats }) => {
                         title="年化波動率"
                         value={stats["年化波動率"]}
                         isPercent={true}
-                        icon={Icons.Activity}
-                        color="bg-purple-500"
                         description="資產價格變動的劇烈程度。"
                     />
 
@@ -129,8 +114,6 @@ export const PerformanceStats = ({ stats }) => {
                     <MetricCard
                         title="歷史最高"
                         value={stats["累計總值高峰"]}
-                        icon={Icons.TrendingUp}
-                        color="bg-blue-400"
                         description="歷史上曾達到過的最高資產總額。"
                     />
                 </div>
