@@ -12,7 +12,7 @@ export const PerformanceStats = ({ stats }) => {
         );
     }
 
-    const formatVal = (val, type = 'number') => {
+    const formatVal = (val, type = 'number', precision = 2) => {
         if (val === undefined || val === null || val === '') return '--';
         const num = Number(val);
         if (isNaN(num)) return val; // Return raw if not a number
@@ -21,10 +21,10 @@ export const PerformanceStats = ({ stats }) => {
             const prefix = num > 0 ? '+' : '';
             return `${prefix}${(num * 100).toFixed(2)}%`;
         }
-        return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+        return num.toLocaleString(undefined, { maximumFractionDigits: precision });
     };
 
-    const MetricCard = ({ title, value, unit, description, isPercent = false }) => (
+    const MetricCard = ({ title, value, unit, description, isPercent = false, precision = 2 }) => (
         <div className="p-5 bg-neutral-900/30 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
             <div className="flex justify-between items-start mb-2">
                 <h4 className="text-sm font-bold text-neutral-400 uppercase tracking-widest">{title}</h4>
@@ -39,7 +39,7 @@ export const PerformanceStats = ({ stats }) => {
             </div>
             <div className="flex items-baseline gap-1 mt-1">
                 <h4 className="text-3xl font-bold text-white tabular-nums tracking-tight">
-                    {isPercent ? formatVal(value, 'percent') : formatVal(value)}
+                    {isPercent ? formatVal(value, 'percent') : formatVal(value, 'number', precision)}
                 </h4>
                 {unit && <span className="text-xs text-neutral-500">{unit}</span>}
             </div>
@@ -114,6 +114,7 @@ export const PerformanceStats = ({ stats }) => {
                     <MetricCard
                         title="歷史最高"
                         value={stats["累計總值高峰"]}
+                        precision={0}
                         description="歷史上曾達到過的最高資產總額。"
                     />
                 </div>
