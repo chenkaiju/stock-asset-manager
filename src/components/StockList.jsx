@@ -53,7 +53,32 @@ export const StockList = ({ data }) => {
         <div className="pb-8">
             {/* Mobile Card View (Sorted) */}
             <div className="grid grid-cols-1 gap-3 md:hidden">
-                {/* Mobile Sort Controls could go here if needed, for now just use sorted data */}
+                {/* Mobile Sort Controls */}
+                <div className="flex gap-2 mb-2 overflow-x-auto pb-2 no-scrollbar">
+                    {[
+                        { label: '預設 (代號)', key: '代號' },
+                        { label: '市值', key: '市值' },
+                        { label: '股價', key: '現價' },
+                        { label: '股數', key: '股數' },
+                    ].map((option) => (
+                        <button
+                            key={option.key}
+                            onClick={() => handleSort(option.key)}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors border ${sortConfig.key === option.key
+                                    ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                                    : 'bg-neutral-800 text-neutral-400 border-transparent hover:bg-neutral-700'
+                                }`}
+                        >
+                            {option.label}
+                            {sortConfig.key === option.key && (
+                                sortConfig.direction === 'asc'
+                                    ? <Icons.ArrowUp size={12} />
+                                    : <Icons.ArrowDown size={12} />
+                            )}
+                        </button>
+                    ))}
+                </div>
+
                 {sortedData.map((stock) => (
                     <div key={stock.代號} className="bg-neutral-900/30 p-4 rounded-2xl border border-white/5 space-y-3">
                         <div className="flex justify-between items-start">
