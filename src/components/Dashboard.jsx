@@ -99,23 +99,36 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                             key={stock.代號}
                             className="flex items-center justify-between p-4 bg-neutral-900/30 rounded-2xl border border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all cursor-pointer group active:scale-[0.98]"
                         >
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-700 flex items-center justify-center font-bold text-sm shadow-lg">
+                            {/* Left: Identity */}
+                            <div className="flex items-center space-x-3 w-[30%]">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-700 flex items-center justify-center font-bold text-sm shadow-lg shrink-0">
                                     {stock.股票名稱[0]}
                                 </div>
-                                <div>
-                                    <h5 className="font-bold text-sm md:text-base">{stock.股票名稱}</h5>
+                                <div className="min-w-0">
+                                    <h5 className="font-bold text-sm md:text-base truncate">{stock.股票名稱}</h5>
                                     <p className="text-xs text-neutral-500">{stock.代號}</p>
                                 </div>
                             </div>
-                            <div className="text-right">
+
+                            {/* Center: Performance */}
+                            <div className="flex flex-col items-center justify-center w-[30%]">
+                                <p className={`text-sm md:text-base font-bold ${stock.當日漲跌 >= 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                    {stock.當日漲跌 > 0 ? '+' : ''}{Number(stock.當日漲跌).toFixed(2)}
+                                </p>
+                                <p className={`text-xs font-medium ${stock.當日漲跌 >= 0 ? 'text-red-400/80' : 'text-emerald-400/80'}`}>
+                                    {Number(stock.當日漲跌幅).toFixed(2)}%
+                                </p>
+                            </div>
+
+                            {/* Right: Asset Details */}
+                            <div className="text-right w-[40%] pl-2">
                                 <p className="text-sm font-bold text-white">
                                     {stock.現價?.toLocaleString()}
                                 </p>
-                                <p className={`text-xs font-medium ${stock.當日漲跌 >= 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                                    {stock.當日漲跌 > 0 ? '+' : ''}{Number(stock.當日漲跌).toFixed(2)} ({Number(stock.當日漲跌幅).toFixed(2)}%)
+                                <p className="text-xs text-neutral-500 my-0.5">
+                                    {stock.股數?.toLocaleString()} 股
                                 </p>
-                                <p className="font-medium text-xs text-neutral-500 mt-1">
+                                <p className="font-medium text-xs md:text-sm text-blue-400">
                                     {formatCurrency(stock.市值)}
                                 </p>
                             </div>

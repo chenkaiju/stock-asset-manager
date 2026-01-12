@@ -71,8 +71,12 @@ export const useStockData = () => {
                         let code = s["股票代碼"] || s["代號"];
                         if (!code) return null;
                         code = String(code).trim();
-                        // If 4 digits, assume TW stock
-                        return /^\d{4}$/.test(code) ? `${code}.TW` : code;
+                        // If it looks like a Taiwan stock (4-5 digits, or digits+char, and no dot)
+                        // optimize for common cases: 2330, 0050, 00940, 00733B
+                        if (!code.includes('.') && /^[0-9A-Z]{4,6}$/.test(code)) {
+                            return `${code}.TW`;
+                        }
+                        return code;
                     }).filter(s => s);
 
                     const uniqueSymbols = [...new Set(symbols)];
@@ -130,7 +134,10 @@ export const useStockData = () => {
                     // Resolve Symbol
                     let symbol = item["股票代碼"] || item["代號"] || "0000";
                     let lookupSymbol = String(symbol).trim();
-                    if (/^\d{4}$/.test(lookupSymbol)) lookupSymbol += '.TW';
+                    // Match the same logic as above for consistency
+                    if (!lookupSymbol.includes('.') && /^[0-9A-Z]{4,6}$/.test(lookupSymbol)) {
+                        lookupSymbol += '.TW';
+                    }
 
                     // live data overlap
                     const liveData = stockMap[lookupSymbol];
