@@ -110,26 +110,24 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                                 </div>
                             </div>
 
-                            {/* Center: Performance */}
-                            <div className="flex flex-col items-center justify-center w-[30%]">
+                            {/* Center: Market Data (Price & Change) */}
+                            <div className="flex flex-col items-center justify-center w-[35%]">
                                 <p className={`text-sm md:text-base font-bold ${stock.當日漲跌 >= 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                                    {stock.當日漲跌 > 0 ? '+' : ''}{Number(stock.當日漲跌).toFixed(2)}
-                                </p>
-                                <p className={`text-xs font-medium ${stock.當日漲跌 >= 0 ? 'text-red-400/80' : 'text-emerald-400/80'}`}>
-                                    {Number(stock.當日漲跌幅).toFixed(2)}%
-                                </p>
-                            </div>
-
-                            {/* Right: Asset Details */}
-                            <div className="text-right w-[40%] pl-2">
-                                <p className="text-sm font-bold text-white">
                                     {stock.現價?.toLocaleString()}
                                 </p>
-                                <p className="text-xs text-neutral-500 my-0.5">
-                                    {stock.股數?.toLocaleString()} 股
-                                </p>
-                                <p className="font-medium text-xs md:text-sm text-blue-400">
+                                <div className={`flex items-center gap-1 text-xs font-medium ${stock.當日漲跌 >= 0 ? 'text-red-400/80' : 'text-emerald-400/80'}`}>
+                                    <span>{stock.當日漲跌 > 0 ? '+' : ''}{Number(stock.當日漲跌).toFixed(2)}</span>
+                                    <span>({Number(stock.當日漲跌幅).toFixed(2)}%)</span>
+                                </div>
+                            </div>
+
+                            {/* Right: Asset Details (Value & Qty) */}
+                            <div className="text-right w-[35%] pl-2">
+                                <p className="font-bold text-sm md:text-base text-white">
                                     {formatCurrency(stock.市值)}
+                                </p>
+                                <p className="text-xs text-neutral-500 mt-0.5">
+                                    {stock.股數?.toLocaleString()} 股
                                 </p>
                             </div>
                         </div>
