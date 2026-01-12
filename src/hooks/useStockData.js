@@ -78,27 +78,48 @@ export const useStockData = () => {
                     const uniqueSymbols = [...new Set(symbols)];
 
                     if (uniqueSymbols.length > 0) {
-                        // Batch fetch from Yahoo
-                        const symbolStr = uniqueSymbols.join(',');
-                        const quoteUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolStr}`;
-                        const quoteData = await fetchWithProxy(quoteUrl);
+                        // Batch fetch failed, so we use Chart API (v8) for each symbol
+                        // This endpoint is more reliable but requires one request per stock
 
-                        const result = quoteData?.quoteResponse?.result || [];
-                        result.forEach(q => {
-                            stockMap[q.symbol] = {
-                                price: q.regularMarketPrice,
-                                change: q.regularMarketChange,
-                                changePercent: q.regularMarketChangePercent
-                            };
-                            // Also map without .TW for easier lookup if needed
-                            if (q.symbol.endsWith('.TW')) {
-                                stockMap[q.symbol.replace('.TW', '')] = stockMap[q.symbol];
+                        // Create a map to store results
+                        const promises = uniqueSymbols.map(async (symbol) => {
+                            try {
+                                const timestamp = new Date().getTime();
+                                const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`;
+                                const dataObj = await fetchWithProxy(chartUrl);
+                                const result = dataObj.chart?.result?.[0];
+
+                                if (result) {
+                                    const meta = result.meta;
+                                    const price = Number(meta.regularMarketPrice);
+                                    const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+
+                                    if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
+                                        const change = price - prevClose;
+                                        const percent = (change / prevClose) * 100;
+
+                                        const data = {
+                                            price,
+                                            change,
+                                            changePercent: percent
+                                        };
+
+                                        stockMap[symbol] = data;
+                                        // Also map without .TW
+                                        if (symbol.endsWith('.TW')) {
+                                            stockMap[symbol.replace('.TW', '')] = data;
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn(`Failed to fetch chart for ${symbol}`, e);
                             }
                         });
+
+                        await Promise.all(promises);
                     }
                 } catch (qErr) {
                     console.error("Failed to fetch stock quotes:", qErr);
-                    // Continue with Sheet data if Yahoo fails
                 }
 
                 // Basic normalization to ensure numbers are numbers
