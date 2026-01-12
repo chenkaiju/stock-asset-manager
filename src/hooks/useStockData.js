@@ -40,6 +40,7 @@ export const useStockData = () => {
         setError(null);
 
         // 1. Fetch Private Data (Google Sheet)
+        // 1. Fetch Private Data (Google Sheet)
         if (sheetUrl) {
             try {
                 const response = await fetch(sheetUrl);
@@ -62,21 +63,81 @@ export const useStockData = () => {
                     throw new Error('Invalid data format: Expected array or object with stocks/history/stats');
                 }
 
+                // --- NEW: Fetch Real-time Quotes for Stocks ---
+                const stockMap = {}; // Map symbol -> { price, change, changePercent }
+                try {
+                    // Extract symbols
+                    const symbols = rawStocks.map(s => {
+                        let code = s["股票代碼"] || s["代號"];
+                        if (!code) return null;
+                        code = String(code).trim();
+                        // If 4 digits, assume TW stock
+                        return /^\d{4}$/.test(code) ? `${code}.TW` : code;
+                    }).filter(s => s);
+
+                    const uniqueSymbols = [...new Set(symbols)];
+
+                    if (uniqueSymbols.length > 0) {
+                        // Batch fetch from Yahoo
+                        const symbolStr = uniqueSymbols.join(',');
+                        const quoteUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolStr}`;
+                        const quoteData = await fetchWithProxy(quoteUrl);
+
+                        const result = quoteData?.quoteResponse?.result || [];
+                        result.forEach(q => {
+                            stockMap[q.symbol] = {
+                                price: q.regularMarketPrice,
+                                change: q.regularMarketChange,
+                                changePercent: q.regularMarketChangePercent
+                            };
+                            // Also map without .TW for easier lookup if needed
+                            if (q.symbol.endsWith('.TW')) {
+                                stockMap[q.symbol.replace('.TW', '')] = stockMap[q.symbol];
+                            }
+                        });
+                    }
+                } catch (qErr) {
+                    console.error("Failed to fetch stock quotes:", qErr);
+                    // Continue with Sheet data if Yahoo fails
+                }
+
                 // Basic normalization to ensure numbers are numbers
                 const normalizedData = rawStocks.map(item => {
                     if (!item) return null; // Safety check
                     const quantity = Number(item["股數"]) || 0;
-                    const price = Number(item["股價"]) || 0; // User column: 股價
-                    const marketValue = Number(item["個股現值"]) || (quantity * price); // User column: 個股現值
+
+                    // Resolve Symbol
+                    let symbol = item["股票代碼"] || item["代號"] || "0000";
+                    let lookupSymbol = String(symbol).trim();
+                    if (/^\d{4}$/.test(lookupSymbol)) lookupSymbol += '.TW';
+
+                    // live data overlap
+                    const liveData = stockMap[lookupSymbol];
+
+                    // Determine Price: Live > Sheet > 0
+                    const price = liveData?.price
+                        ? Number(liveData.price)
+                        : (Number(item["股價"]) || 0);
+
+                    // Determine Market Value
+                    // If we have live price, Recalculate: Quantity * LivePrice
+                    // Otherwise use Sheet's market value
+                    const marketValue = liveData?.price
+                        ? quantity * price
+                        : (Number(item["個股現值"]) || (quantity * price));
 
                     return {
                         ...item,
                         // Internal App Keys mapped from Sheet Columns
                         "股票名稱": item["股名"] || item["股票名稱"] || "Unknown", // User column: 股名
-                        "代號": item["股票代碼"] || item["代號"] || "0000", // User column: 股票代碼
+                        "代號": symbol,
                         "股數": quantity,
                         "現價": price,
                         "市值": marketValue,
+                        // New Fields for UI
+                        "當日漲跌": liveData?.change || 0,
+                        "當日漲跌幅": liveData?.changePercent || 0,
+                        "isLiveData": !!liveData
                     };
                 }).filter(item => item !== null); // Remove nulls
 

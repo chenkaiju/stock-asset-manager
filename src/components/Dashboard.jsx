@@ -108,11 +108,14 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                                     <p className="text-xs text-neutral-500">{stock.代號}</p>
                                 </div>
                             </div>
-                            <div className="text-right space-y-0.5">
-                                <p className="text-sm font-medium text-neutral-300">
-                                    {stock.現價?.toLocaleString()} <span className="text-xs text-neutral-500">| {stock.股數?.toLocaleString()} 股</span>
+                            <div className="text-right">
+                                <p className="text-sm font-bold text-white">
+                                    {stock.現價?.toLocaleString()}
                                 </p>
-                                <p className="font-bold text-sm md:text-base text-blue-400">
+                                <p className={`text-xs font-medium ${stock.當日漲跌 >= 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                    {stock.當日漲跌 > 0 ? '+' : ''}{Number(stock.當日漲跌).toFixed(2)} ({Number(stock.當日漲跌幅).toFixed(2)}%)
+                                </p>
+                                <p className="font-medium text-xs text-neutral-500 mt-1">
                                     {formatCurrency(stock.市值)}
                                 </p>
                             </div>
