@@ -6,6 +6,8 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
     // Calculate Today's Change based on most recent historical value before today
     // Calculate Today's Change based on most recent historical value before today
     // Use Taiwan time to ensure consistency with data parsing
+    const [showBalance, setShowBalance] = React.useState(true);
+
     const todayStr = new Date().toLocaleDateString('zh-TW', {
         timeZone: 'Asia/Taipei',
         year: 'numeric',
@@ -61,24 +63,40 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
 
                 <div className="relative z-10 flex flex-col justify-between h-full space-y-4 md:space-y-0">
                     <div className="flex justify-between items-center w-full">
-                        <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
-                            <Icons.Wallet size={16} /> 總資產估值
-                        </p>
+                        <div className="flex items-center gap-3">
+                            <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
+                                <Icons.Wallet size={16} /> 總資產估值
+                            </p>
+                            <button
+                                onClick={() => setShowBalance(!showBalance)}
+                                className="text-blue-300/50 hover:text-blue-300 transition-colors p-1 rounded-full hover:bg-blue-500/10"
+                            >
+                                {showBalance ? <Icons.Eye size={16} /> : <Icons.EyeOff size={16} />}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-2">
                         <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-white">
-                            {formatCurrency(totalValue)}
+                            {showBalance ? formatCurrency(totalValue) : '****'}
                         </h3>
-                        <div className={`flex items-center space-x-2 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border ${isPositive
-                            ? 'text-red-400 bg-red-400/10 border-red-400/20'
-                            : 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
+                        <div className={`flex items-center space-x-2 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border ${!showBalance
+                                ? 'text-neutral-400 bg-neutral-400/10 border-neutral-400/20'
+                                : isPositive
+                                    ? 'text-red-400 bg-red-400/10 border-red-400/20'
+                                    : 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
                             }`}>
-                            {isPositive ? <Icons.ArrowUpRight size={14} /> : <Icons.ArrowDownRight size={14} />}
-                            <span>
-                                {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
-                                &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
-                            </span>
+                            {!showBalance ? (
+                                <span>----</span>
+                            ) : (
+                                <>
+                                    {isPositive ? <Icons.ArrowUpRight size={14} /> : <Icons.ArrowDownRight size={14} />}
+                                    <span>
+                                        {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
+                                        &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
+                                    </span>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
