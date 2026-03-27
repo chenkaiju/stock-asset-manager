@@ -11,6 +11,8 @@
 
 ## 已完成
 
+- [x] 替換字型：將 M PLUS Rounded 1c 改為 Noto Serif TC（繁體中文明體），更新 index.css 的 @import 與 --font-family 變數，確認各元件標題 / body 字重對應（Display 用 700、Label / Body 用 400）
+
 - [x] 建立 CSS 設計變數系統：color tokens（surface 層級、primary、tertiary）、spacing、radius（16px sm / 32px lg / 24px btn / 999px pill）
 - [x] 引入 M PLUS Rounded 1c 字體（Google Fonts），設定 Typography Scale（Display-LG 800/3.5rem 到 Label-MD 800/0.75rem）
 - [x] 重寫 index.css 全域樣式：cream 底色 #FEFCF1、on-surface 文字 #383831、移除所有 1px solid border、設定 ambient shadow utility class

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 /* =====================================================
@@ -54,25 +54,25 @@
   --space-12: 3rem;
 
   /* --- Typography Scale --- */
-  --font-family: 'M PLUS Rounded 1c', system-ui, sans-serif;
+  --font-family: 'Noto Serif TC', 'Georgia', serif;
 
   --text-display-lg-size:    3.5rem;
-  --text-display-lg-weight:  800;
+  --text-display-lg-weight:  700;
   --text-display-lg-tracking: -0.02em;
 
   --text-headline-md-size:   1.75rem;
-  --text-headline-md-weight: 800;
+  --text-headline-md-weight: 700;
   --text-headline-md-tracking: -0.01em;
 
   --text-title-md-size:      1.125rem;
-  --text-title-md-weight:    800;
+  --text-title-md-weight:    700;
 
   --text-body-lg-size:       1rem;
-  --text-body-lg-weight:     500;
+  --text-body-lg-weight:     400;
   --text-body-lg-tracking:   0.01em;
 
   --text-label-md-size:      0.75rem;
-  --text-label-md-weight:    800;
+  --text-label-md-weight:    500;
   --text-label-md-tracking:  0.05em;
 }
 
