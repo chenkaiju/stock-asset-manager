@@ -1,89 +1,108 @@
 import React from 'react';
 import { Icons } from './Icons';
 
+const NAV_ITEMS = [
+    { tab: 'dashboard',  label: '概覽',    Icon: Icons.LayoutDashboard },
+    { tab: 'history',    label: '趨勢分析', Icon: Icons.BarChart3 },
+    { tab: 'stocks',     label: '持股清單', Icon: Icons.List },
+    { tab: 'performance',label: '績效分析', Icon: Icons.Activity },
+    { tab: 'rates',      label: '匯率資訊', Icon: Icons.Globe },
+    { tab: 'macro',      label: '總經觀察', Icon: Icons.TrendingUp },
+    { tab: 'datasource', label: '資料來源', Icon: Icons.Database },
+];
+
 export const Sidebar = ({ activeTab, setActiveTab }) => {
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#121212] border-t border-white/10 md:top-0 md:bottom-0 md:right-auto md:w-64 md:border-t-0 md:border-r md:flex md:flex-col p-2 md:p-6 shadow-2xl md:shadow-none">
-            <div className="hidden md:block mb-10 px-2">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent flex items-center gap-2">
-                    <Icons.Wallet className="text-blue-400" /> AssetFlow
-                </h1>
-                <p className="text-xs text-neutral-500 mt-2 pl-1">Stock Portfolio Tracker</p>
-            </div>
+        <nav
+            style={{
+                position: 'fixed',
+                zIndex: 50,
+                fontFamily: 'var(--font-family)',
+            }}
+            className="
+                bottom-0 left-0 right-0
+                md:top-0 md:bottom-0 md:right-auto md:w-64
+            "
+        >
+            {/* Glass panel */}
+            <div
+                className="glass"
+                style={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: 'var(--space-3)',
+                    borderRight: '1px solid var(--color-outline-variant)',
+                    borderTop: '1px solid var(--color-outline-variant)',
+                }}
+                // Mobile: border-top only; desktop: border-right only (handled via className media)
+            >
+                {/* Logo — desktop only */}
+                <div className="hidden md:flex" style={{ alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4) var(--space-3)', marginBottom: 'var(--space-6)' }}>
+                    <div style={{
+                        width: 38, height: 38,
+                        borderRadius: 'var(--radius-sm)',
+                        background: 'var(--gradient-primary)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: 'var(--shadow-card)',
+                    }}>
+                        <Icons.Wallet size={18} style={{ color: 'var(--color-on-primary-fixed)' }} />
+                    </div>
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: 'var(--text-title-md-size)', fontWeight: 800, color: 'var(--color-on-surface)' }}>AssetFlow</h1>
+                        <p className="text-label-md" style={{ margin: 0 }}>Portfolio Tracker</p>
+                    </div>
+                </div>
 
-            <div className="flex overflow-x-auto md:overflow-visible justify-start md:justify-start gap-2 md:gap-0 md:space-y-2 no-scrollbar px-2 md:px-0 md:flex-col">
-                <button
-                    onClick={() => setActiveTab('dashboard')}
-                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'dashboard'
-                        ? 'text-blue-400 bg-blue-400/10'
-                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
-                        }`}
+                {/* Nav items */}
+                <div
+                    className="flex md:flex-col overflow-x-auto md:overflow-visible no-scrollbar"
+                    style={{ gap: 'var(--space-1)' }}
                 >
-                    <Icons.LayoutDashboard size={20} className="md:w-6 md:h-6" />
-                    <span className="text-[10px] md:text-base font-medium">概覽</span>
-                </button>
-                <button
-                    onClick={() => setActiveTab('history')}
-                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'history'
-                        ? 'text-blue-400 bg-blue-400/10'
-                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
-                        }`}
-                >
-                    <Icons.BarChart3 size={20} className="md:w-6 md:h-6" />
-                    <span className="text-[10px] md:text-base font-medium">趨勢分析</span>
-                </button>
-                <button
-                    onClick={() => setActiveTab('stocks')}
-                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'stocks'
-                        ? 'text-blue-400 bg-blue-400/10'
-                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
-                        }`}
-                >
-                    <Icons.List size={20} className="md:w-6 md:h-6" />
-                    <span className="text-[10px] md:text-base font-medium">持股清單</span>
-                </button>
-
-                <button
-                    onClick={() => setActiveTab('performance')}
-                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'performance'
-                        ? 'text-blue-400 bg-blue-400/10'
-                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
-                        }`}
-                >
-                    <Icons.Activity size={20} className="md:w-6 md:h-6" />
-                    <span className="text-[10px] md:text-base font-medium">績效分析</span>
-                </button>
-                <button
-                    onClick={() => setActiveTab('rates')}
-                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'rates'
-                        ? 'text-blue-400 bg-blue-400/10'
-                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
-                        }`}
-                >
-                    <Icons.Globe size={20} className="md:w-6 md:h-6" />
-                    <span className="text-[10px] md:text-base font-medium">匯率資訊</span>
-                </button>
-                <button
-                    onClick={() => setActiveTab('macro')}
-                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'macro'
-                        ? 'text-blue-400 bg-blue-400/10'
-                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
-                        }`}
-                >
-                    <Icons.TrendingUp size={20} className="md:w-6 md:h-6" />
-                    <span className="text-[10px] md:text-base font-medium">總經觀察</span>
-                </button>
-                <button
-                    onClick={() => setActiveTab('datasource')}
-                    className={`flex-shrink-0 flex flex-col md:flex-row items-center justify-center md:justify-start space-y-1 md:space-y-0 md:space-x-4 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === 'datasource'
-                        ? 'text-blue-400 bg-blue-400/10'
-                        : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/5'
-                        }`}
-                >
-                    <Icons.Database size={20} className="md:w-6 md:h-6" />
-                    <span className="text-[10px] md:text-base font-medium">資料來源</span>
-                </button>
+                    {NAV_ITEMS.map(({ tab, label, Icon }) => {
+                        const active = activeTab === tab;
+                        return (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                style={{
+                                    flexShrink: 0,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: 4,
+                                    padding: 'var(--space-3)',
+                                    borderRadius: 'var(--radius-sm)',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    fontFamily: 'var(--font-family)',
+                                    transition: 'background 0.15s, transform 0.1s',
+                                    background: active ? 'var(--color-primary-fixed)' : 'transparent',
+                                    color: active ? 'var(--color-on-primary-fixed)' : 'var(--color-on-surface-variant)',
+                                    transform: active ? 'scale(1)' : 'scale(1)',
+                                    minWidth: 56,
+                                }}
+                                className="md:flex-row md:justify-start md:gap-3 md:px-4"
+                                onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'var(--color-surface-container-high)'; }}
+                                onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+                            >
+                                <Icon size={20} />
+                                <span style={{
+                                    fontSize: 'var(--text-label-md-size)',
+                                    fontWeight: 800,
+                                    letterSpacing: '0.03em',
+                                    whiteSpace: 'nowrap',
+                                }}
+                                    className="text-[10px] md:text-sm"
+                                >
+                                    {label}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
-        </nav >
+        </nav>
     );
 };

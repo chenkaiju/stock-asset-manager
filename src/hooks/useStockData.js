@@ -89,7 +89,7 @@ export const useStockData = () => {
                         const promises = uniqueSymbols.map(async (symbol) => {
                             try {
                                 const timestamp = new Date().getTime();
-                                const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`;
+                                const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&lang=zh-Hant-TW&region=TW&_t=${timestamp}`;
                                 const dataObj = await fetchWithProxy(chartUrl);
                                 const result = dataObj.chart?.result?.[0];
 
@@ -97,6 +97,10 @@ export const useStockData = () => {
                                     const meta = result.meta;
                                     const price = Number(meta.regularMarketPrice);
                                     const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+                                    // Extract Name, prefer longName (complete name), fallback to shortName or symbol
+                                    // Try to get Chinese name if available via the lang param
+                                    const name = meta.longName || meta.shortName || symbol;
+
 
                                     if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
                                         const change = price - prevClose;
@@ -105,7 +109,8 @@ export const useStockData = () => {
                                         const data = {
                                             price,
                                             change,
-                                            changePercent: percent
+                                            changePercent: percent,
+                                            name: name // Store the fetched name
                                         };
 
                                         stockMap[symbol] = data;
@@ -157,7 +162,7 @@ export const useStockData = () => {
                     return {
                         ...item,
                         // Internal App Keys mapped from Sheet Columns
-                        "股票名稱": item["股名"] || item["股票名稱"] || "Unknown", // User column: 股名
+                        "股票名稱": item["股名"] || item["股票名稱"] || liveData?.name || "Unknown", // User column: 股名
                         "代號": symbol,
                         "股數": quantity,
                         "現價": price,

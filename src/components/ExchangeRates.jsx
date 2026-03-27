@@ -1,39 +1,59 @@
 import React from 'react';
 import { Icons } from './Icons';
 
+const CURRENCIES = [
+    { code: 'USD', name: '美金', flag: 'us' },
+    { code: 'EUR', name: '歐元', flag: 'eu' },
+    { code: 'JPY', name: '日圓', flag: 'jp' },
+    { code: 'CNY', name: '人民幣', flag: 'cn' },
+];
+
 export const ExchangeRates = ({ rates, loading }) => {
     if (loading && (!rates || Object.keys(rates).length === 0)) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 text-neutral-500">
-                <Icons.RefreshedCcw size={48} className="mb-4 animate-spin opacity-50" />
-                <p>Loading Exchange Rates...</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-12)', color: 'var(--color-on-surface-variant)' }}>
+                <Icons.RefreshedCcw size={40} className="animate-spin" style={{ opacity: 0.4, marginBottom: 'var(--space-4)' }} />
+                <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-label-md-size)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    載入匯率中...
+                </p>
             </div>
         );
     }
 
-    const currencies = [
-        { code: 'USD', name: '美金', flag: 'us' },
-        { code: 'EUR', name: '歐元', flag: 'eu' },
-        { code: 'JPY', name: '日圓', flag: 'jp' },
-        { code: 'CNY', name: '人民幣', flag: 'cn' },
-    ];
-
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-blue-500/20 rounded-xl">
-                    <Icons.Globe size={24} className="text-blue-400" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+
+            {/* Page header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                <div style={{
+                    width: 44, height: 44,
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--color-surface-container-high)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: 'inset 0 1px 2px rgba(56,56,49,0.10)',
+                }}>
+                    <Icons.Globe size={22} style={{ color: 'var(--color-primary)' }} />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+                    <h2 style={{ margin: 0, fontSize: 'var(--text-headline-md-size)', fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--color-on-surface)' }}>
                         匯率資訊
                     </h2>
-                    <p className="text-xs text-neutral-500">即時匯率 (兌台幣 TWD)</p>
+                    <p className="text-label-md" style={{ margin: 0 }}>即時匯率 · 兌台幣 TWD</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {currencies.map((currency) => {
+            {/* Currency cards */}
+            <div
+                style={{
+                    background: 'var(--color-surface-container-low)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--space-4)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                    gap: 'var(--space-3)',
+                }}
+            >
+                {CURRENCIES.map((currency) => {
                     const rateData = rates ? rates[currency.code] : null;
                     const price = rateData?.price;
                     const change = rateData?.change;
@@ -41,46 +61,95 @@ export const ExchangeRates = ({ rates, loading }) => {
                     const isPositive = change && parseFloat(change) >= 0;
 
                     return (
-                        <div key={currency.code} className="p-6 bg-neutral-900/30 rounded-3xl border border-white/5 hover:border-white/10 transition-all group">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-neutral-800 overflow-hidden border-2 border-neutral-700/50 flex-shrink-0">
-                                        <img
-                                            src={`https://flagcdn.com/w80/${currency.flag}.png`}
-                                            alt={currency.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-lg">{currency.code}</div>
-                                        <div className="text-xs text-neutral-500">{currency.name}</div>
-                                    </div>
+                        <div
+                            key={currency.code}
+                            style={{
+                                background: 'var(--color-surface-container-lowest)',
+                                borderRadius: 'var(--radius-lg)',
+                                padding: 'var(--space-5)',
+                                boxShadow: 'var(--shadow-card)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 'var(--space-4)',
+                                transition: 'box-shadow 0.15s',
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--shadow-float)'}
+                            onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow-card)'}
+                        >
+                            {/* Flag + name */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                                <div style={{
+                                    width: 40, height: 40,
+                                    borderRadius: 'var(--radius-sm)',
+                                    overflow: 'hidden',
+                                    flexShrink: 0,
+                                    boxShadow: 'var(--shadow-card)',
+                                }}>
+                                    <img
+                                        src={`https://flagcdn.com/w80/${currency.flag}.png`}
+                                        alt={currency.name}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                </div>
+                                <div>
+                                    <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-title-md-size)', color: 'var(--color-on-surface)' }}>
+                                        {currency.code}
+                                    </p>
+                                    <p className="text-label-md" style={{ margin: 0 }}>{currency.name}</p>
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
-                                <div className="text-3xl font-bold text-white tabular-nums tracking-tight">
+                            {/* Price + change */}
+                            <div>
+                                <p style={{
+                                    margin: 0,
+                                    fontSize: '2rem',
+                                    fontWeight: 800,
+                                    letterSpacing: '-0.02em',
+                                    color: 'var(--color-on-surface)',
+                                    fontVariantNumeric: 'tabular-nums',
+                                }}>
                                     {price ? price.toFixed(currency.code === 'JPY' ? 4 : 2) : '--'}
-                                </div>
-                                <div className={`text-sm font-medium flex items-center gap-1 ${isPositive ? 'text-red-400' : 'text-emerald-400'}`}>
+                                </p>
+                                <p style={{
+                                    margin: '4px 0 0',
+                                    fontSize: 'var(--text-body-lg-size)',
+                                    fontWeight: 800,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    color: change
+                                        ? (isPositive ? '#c0392b' : '#2d7a4f')
+                                        : 'var(--color-on-surface-variant)',
+                                }}>
                                     {change ? (
                                         <>
-                                            {isPositive ? <Icons.TrendingUp size={14} /> : <Icons.TrendingDown size={14} />}
-                                            <span>{change > 0 ? '+' : ''}{change.toFixed(4)} ({percent})</span>
+                                            {isPositive
+                                                ? <Icons.TrendingUp size={14} />
+                                                : <Icons.TrendingDown size={14} />}
+                                            {change > 0 ? '+' : ''}{change.toFixed(4)} ({percent})
                                         </>
-                                    ) : (
-                                        <span className="text-neutral-600">--</span>
-                                    )}
-                                </div>
+                                    ) : '--'}
+                                </p>
                             </div>
                         </div>
                     );
                 })}
             </div>
 
-            <div className="mt-8 p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-200 text-xs flex items-center gap-3">
-                <Icons.Info size={16} className="shrink-0" />
-                <p>資料來源：Yahoo Finance。報價可能會有延遲，僅供參考。</p>
+            {/* Disclaimer */}
+            <div style={{
+                background: 'var(--color-surface-container-high)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-4) var(--space-5)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)',
+            }}>
+                <Icons.Info size={15} style={{ color: 'var(--color-on-surface-variant)', flexShrink: 0 }} />
+                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', fontWeight: 800, letterSpacing: '0.03em', color: 'var(--color-on-surface-variant)' }}>
+                    資料來源：Yahoo Finance。報價可能會有延遲，僅供參考。
+                </p>
             </div>
         </div>
     );

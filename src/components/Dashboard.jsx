@@ -3,9 +3,6 @@ import { Icons } from './Icons';
 import { formatCurrency } from '../utils/formatters';
 
 export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
-    // Calculate Today's Change based on most recent historical value before today
-    // Calculate Today's Change based on most recent historical value before today
-    // Use Taiwan time to ensure consistency with data parsing
     const [showBalance, setShowBalance] = React.useState(false);
 
     const todayStr = new Date().toLocaleDateString('zh-TW', {
@@ -28,123 +25,244 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
     const isPositive = todayChange >= 0;
 
     return (
-        <div className="space-y-6">
-            {/* Market Index Card */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+
+            {/* Market Index */}
             {marketData && (
-                <div className="grid grid-cols-1 gap-4">
-                    <div className="p-4 bg-neutral-900/30 rounded-2xl border border-white/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
-                                <Icons.TrendingUp size={20} className="text-orange-500" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">Market Index</p>
-                                <h3 className="text-base font-bold text-white">{marketData.name}</h3>
-                            </div>
+                <div
+                    style={{
+                        background: 'var(--color-surface-container-low)',
+                        borderRadius: 'var(--radius-lg)',
+                        padding: 'var(--space-4) var(--space-6)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: 'var(--space-4)',
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                        <div style={{
+                            width: 40, height: 40,
+                            borderRadius: 'var(--radius-sm)',
+                            background: 'var(--color-surface-container-high)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            boxShadow: 'inset 0 1px 2px rgba(56,56,49,0.10)',
+                        }}>
+                            <Icons.TrendingUp size={18} style={{ color: 'var(--color-primary)' }} />
                         </div>
-                        <div className="flex items-baseline gap-4">
-                            <div className="text-2xl font-bold text-white tabular-nums">
-                                {marketData.index?.toLocaleString()}
-                            </div>
-                            <div className={`text-base font-bold flex items-center gap-1 ${marketData.change?.includes('-') ? 'text-emerald-400' : 'text-red-400'}`}>
-                                {marketData.change?.includes('-') ? <Icons.ArrowDownRight size={16} /> : <Icons.ArrowUpRight size={16} />}
-                                <span>{marketData.change} ({marketData.percent})</span>
-                            </div>
+                        <div>
+                            <p className="text-label-md">Market Index</p>
+                            <h3 style={{ margin: 0, fontSize: 'var(--text-title-md-size)', fontWeight: 800, color: 'var(--color-on-surface)' }}>
+                                {marketData.name}
+                            </h3>
                         </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-4)' }}>
+                        <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>
+                            {marketData.index?.toLocaleString()}
+                        </span>
+                        <span style={{
+                            fontSize: 'var(--text-body-lg-size)',
+                            fontWeight: 800,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            color: marketData.change?.includes('-') ? '#2d7a4f' : '#c0392b',
+                        }}>
+                            {marketData.change?.includes('-')
+                                ? <Icons.ArrowDownRight size={16} />
+                                : <Icons.ArrowUpRight size={16} />}
+                            {marketData.change} ({marketData.percent})
+                        </span>
                     </div>
                 </div>
             )}
 
-            {/* Summary Cards */}
-            {/* Summary Card - Single Full Width */}
-            <div className="relative p-6 md:p-8 bg-gradient-to-br from-blue-900/40 to-slate-900/40 rounded-3xl border border-blue-500/20 backdrop-blur-sm overflow-hidden">
+            {/* Total Asset Card */}
+            <div
+                style={{
+                    background: 'var(--color-surface-container-lowest)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--space-8)',
+                    boxShadow: 'var(--shadow-float)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                }}
+            >
+                {/* Warm glow decoration */}
+                <div style={{
+                    position: 'absolute', top: -60, right: -60,
+                    width: 200, height: 200,
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(249,204,97,0.18) 0%, transparent 70%)',
+                    pointerEvents: 'none',
+                }} />
 
-                <div className="absolute top-0 right-0 p-32 bg-blue-500/10 blur-3xl rounded-full translate-x-12 -translate-y-12"></div>
-
-                <div className="relative z-10 flex flex-col justify-between h-full space-y-4 md:space-y-0">
-                    <div className="flex justify-between items-center w-full">
-                        <div className="flex items-center gap-3">
-                            <p className="text-blue-300 font-medium text-sm flex items-center gap-2">
-                                <Icons.Wallet size={16} /> 總資產估值
-                            </p>
-                            <button
-                                onClick={() => setShowBalance(!showBalance)}
-                                className="text-blue-300/50 hover:text-blue-300 transition-colors p-1 rounded-full hover:bg-blue-500/10"
-                            >
-                                {showBalance ? <Icons.Eye size={16} /> : <Icons.EyeOff size={16} />}
-                            </button>
-                        </div>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+                        <Icons.Wallet size={16} style={{ color: 'var(--color-primary)' }} />
+                        <span className="text-label-md">總資產估值</span>
+                        <button
+                            onClick={() => setShowBalance(!showBalance)}
+                            style={{
+                                background: 'none', border: 'none', cursor: 'pointer',
+                                padding: '4px', borderRadius: 'var(--radius-pill)',
+                                color: 'var(--color-on-surface-variant)',
+                                display: 'flex', alignItems: 'center',
+                                transition: 'color 0.15s',
+                            }}
+                        >
+                            {showBalance ? <Icons.Eye size={15} /> : <Icons.EyeOff size={15} />}
+                        </button>
                     </div>
 
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-2">
-                        <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-white">
-                            {showBalance ? formatCurrency(totalValue) : '****'}
-                        </h3>
-                        <div className={`flex items-center space-x-2 w-fit px-3 py-1.5 rounded-full text-xs font-semibold border ${!showBalance
-                            ? 'text-neutral-400 bg-neutral-400/10 border-neutral-400/20'
-                            : isPositive
-                                ? 'text-red-400 bg-red-400/10 border-red-400/20'
-                                : 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
-                            }`}>
-                            {!showBalance ? (
-                                <span>----</span>
-                            ) : (
-                                <>
-                                    {isPositive ? <Icons.ArrowUpRight size={14} /> : <Icons.ArrowDownRight size={14} />}
-                                    <span>
-                                        {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
-                                        &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
-                                    </span>
-                                </>
-                            )}
-                        </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-4)' }}>
+                        <h2 style={{
+                            margin: 0,
+                            fontSize: 'clamp(1.75rem, 4vw, 3rem)',
+                            fontWeight: 800,
+                            letterSpacing: '-0.02em',
+                            color: 'var(--color-on-surface)',
+                            fontVariantNumeric: 'tabular-nums',
+                        }}>
+                            {showBalance ? formatCurrency(totalValue) : '• • • • •'}
+                        </h2>
+
+                        {showBalance ? (
+                            <div style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 6,
+                                padding: '6px 14px',
+                                borderRadius: 'var(--radius-pill)',
+                                background: isPositive
+                                    ? 'rgba(192, 57, 43, 0.10)'
+                                    : 'rgba(45, 122, 79, 0.10)',
+                                color: isPositive ? '#c0392b' : '#2d7a4f',
+                                fontSize: 'var(--text-body-lg-size)',
+                                fontWeight: 800,
+                            }}>
+                                {isPositive ? <Icons.ArrowUpRight size={15} /> : <Icons.ArrowDownRight size={15} />}
+                                {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
+                                &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
+                            </div>
+                        ) : (
+                            <div style={{
+                                display: 'inline-flex', alignItems: 'center',
+                                padding: '6px 14px',
+                                borderRadius: 'var(--radius-pill)',
+                                background: 'var(--color-surface-container-high)',
+                                color: 'var(--color-on-surface-variant)',
+                                fontSize: 'var(--text-label-md-size)',
+                                fontWeight: 800,
+                                letterSpacing: '0.05em',
+                            }}>
+                                ——
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Recent Performance Section */}
+            {/* Top Holdings */}
             <section>
-                <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-                    <Icons.TrendingUp size={18} className="text-blue-400" />
-                    <span>主要持股</span>
-                    <span className="text-xs font-normal text-neutral-500 bg-neutral-800 px-2 py-0.5 rounded-lg border border-white/5">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
+                    <h4 style={{ margin: 0, fontSize: 'var(--text-title-md-size)', fontWeight: 800, color: 'var(--color-on-surface)' }}>
+                        主要持股
+                    </h4>
+                    <span style={{
+                        background: 'var(--color-surface-container-high)',
+                        borderRadius: 'var(--radius-pill)',
+                        padding: '2px 10px',
+                        fontSize: 'var(--text-label-md-size)',
+                        fontWeight: 800,
+                        letterSpacing: '0.05em',
+                        color: 'var(--color-on-surface-variant)',
+                        textTransform: 'uppercase',
+                    }}>
                         共 {data.length} 檔
                     </span>
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                </div>
+
+                <div style={{
+                    background: 'var(--color-surface-container-low)',
+                    borderRadius: 'var(--radius-lg)',
+                    overflow: 'hidden',
+                    padding: 'var(--space-4)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-2)',
+                }}>
                     {[...data].sort((a, b) => b.市值 - a.市值).slice(0, 10).map((stock) => (
                         <div
                             key={stock.代號}
-                            className="flex items-center justify-between p-4 bg-neutral-900/30 rounded-2xl border border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all cursor-pointer group active:scale-[0.98]"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: 'var(--space-4)',
+                                background: 'var(--color-surface-container-lowest)',
+                                borderRadius: 'var(--radius-sm)',
+                                boxShadow: 'var(--shadow-card)',
+                                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                                cursor: 'pointer',
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.transform = 'scale(1.005)';
+                                e.currentTarget.style.boxShadow = 'var(--shadow-float)';
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = 'var(--shadow-card)';
+                            }}
                         >
-                            {/* Left: Identity */}
-                            <div className="flex items-center space-x-3 w-[30%]">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-700 flex items-center justify-center font-bold text-sm shadow-lg shrink-0">
+                            {/* Avatar + Name */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', width: '30%' }}>
+                                <div style={{
+                                    width: 40, height: 40, borderRadius: 'var(--radius-sm)',
+                                    background: 'var(--gradient-primary)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontWeight: 800, fontSize: '1rem',
+                                    color: 'var(--color-on-primary-fixed)',
+                                    flexShrink: 0,
+                                    boxShadow: 'var(--shadow-card)',
+                                }}>
                                     {stock.股票名稱[0]}
                                 </div>
-                                <div className="min-w-0">
-                                    <h5 className="font-bold text-sm md:text-base truncate">{stock.股票名稱}</h5>
-                                    <p className="text-xs text-neutral-500">{stock.代號}</p>
+                                <div style={{ minWidth: 0 }}>
+                                    <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-body-lg-size)', color: 'var(--color-on-surface)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        {stock.股票名稱}
+                                    </p>
+                                    <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em' }}>
+                                        {stock.代號}
+                                    </p>
                                 </div>
                             </div>
 
-                            {/* Center: Market Data (Price & Change) */}
-                            <div className="flex flex-col items-center justify-center w-[35%]">
-                                <p className={`text-sm md:text-base font-bold ${stock.當日漲跌 >= 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                            {/* Price + Change */}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
+                                <p style={{
+                                    margin: 0, fontWeight: 800,
+                                    fontSize: 'var(--text-body-lg-size)',
+                                    color: stock.當日漲跌 >= 0 ? '#c0392b' : '#2d7a4f',
+                                    fontVariantNumeric: 'tabular-nums',
+                                }}>
                                     {stock.現價?.toLocaleString()}
                                 </p>
-                                <div className={`flex items-center gap-1 text-xs font-medium ${stock.當日漲跌 >= 0 ? 'text-red-400/80' : 'text-emerald-400/80'}`}>
-                                    <span>{stock.當日漲跌 > 0 ? '+' : ''}{Number(stock.當日漲跌).toFixed(2)}</span>
-                                    <span>({Number(stock.當日漲跌幅).toFixed(2)}%)</span>
-                                </div>
+                                <p style={{
+                                    margin: 0, fontSize: '0.8rem', fontWeight: 500,
+                                    color: stock.當日漲跌 >= 0 ? 'rgba(192,57,43,0.75)' : 'rgba(45,122,79,0.75)',
+                                }}>
+                                    {stock.當日漲跌 > 0 ? '+' : ''}{Number(stock.當日漲跌).toFixed(2)}
+                                    &nbsp;({Number(stock.當日漲跌幅).toFixed(2)}%)
+                                </p>
                             </div>
 
-                            {/* Right: Asset Details (Value & Qty) */}
-                            <div className="text-right w-[35%] pl-2">
-                                <p className="font-bold text-sm md:text-base text-white">
+                            {/* Value + Shares */}
+                            <div style={{ textAlign: 'right', width: '35%' }}>
+                                <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-body-lg-size)', color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>
                                     {formatCurrency(stock.市值)}
                                 </p>
-                                <p className="text-xs text-neutral-500 mt-0.5">
+                                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, marginTop: 2, letterSpacing: '0.03em' }}>
                                     {stock.股數?.toLocaleString()} 股
                                 </p>
                             </div>

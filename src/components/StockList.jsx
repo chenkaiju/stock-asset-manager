@@ -2,165 +2,224 @@ import React from 'react';
 import { Icons } from './Icons';
 import { formatCurrency } from '../utils/formatters';
 
+const SORT_OPTIONS = [
+    { label: '代號', key: '代號' },
+    { label: '市值', key: '市值' },
+    { label: '股價', key: '現價' },
+    { label: '股數', key: '股數' },
+];
+
+const colStyle = {
+    label: { color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-label-md-size)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', userSelect: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 },
+};
+
 export const StockList = ({ data }) => {
     const [sortConfig, setSortConfig] = React.useState({ key: '代號', direction: 'asc' });
 
     const handleSort = (key) => {
-        let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
+        setSortConfig(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+        }));
     };
 
     const sortedData = React.useMemo(() => {
         if (!data) return [];
         return [...data].sort((a, b) => {
-            const aValue = a[sortConfig.key];
-            const bValue = b[sortConfig.key];
-
-            if (aValue < bValue) {
-                return sortConfig.direction === 'asc' ? -1 : 1;
-            }
-            if (aValue > bValue) {
-                return sortConfig.direction === 'asc' ? 1 : -1;
-            }
+            const av = a[sortConfig.key], bv = b[sortConfig.key];
+            if (av < bv) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (av > bv) return sortConfig.direction === 'asc' ? 1 : -1;
             return 0;
         });
     }, [data, sortConfig]);
 
-    const SortIcon = ({ columnKey }) => {
-        if (sortConfig.key !== columnKey) return <div className="w-4 h-4" />; // Placeholder
+    const SortArrow = ({ colKey }) => {
+        if (sortConfig.key !== colKey) return null;
         return sortConfig.direction === 'asc'
-            ? <Icons.ArrowUp size={14} className="text-blue-400" />
-            : <Icons.ArrowDown size={14} className="text-blue-400" />;
+            ? <Icons.ArrowUp size={12} style={{ color: 'var(--color-primary)' }} />
+            : <Icons.ArrowDown size={12} style={{ color: 'var(--color-primary)' }} />;
     };
 
-    // Sortable Header Component
-    const SortableHeader = ({ label, sortKey, align = "left" }) => (
-        <th
-            className={`px-6 py-4 font-medium cursor-pointer hover:text-white transition-colors select-none ${align === "right" ? "text-right" : "text-left"}`}
-            onClick={() => handleSort(sortKey)}
-        >
-            <div className={`flex items-center gap-1 ${align === "right" ? "justify-end" : "justify-start"}`}>
-                {label}
-                <SortIcon columnKey={sortKey} />
-            </div>
-        </th>
-    );
-
     return (
-        <div className="pb-8">
-            {/* Mobile Card View (Sorted) */}
-            <div className="grid grid-cols-1 gap-3 md:hidden">
-                {/* Mobile Sort Controls */}
-                <div className="flex gap-2 mb-2 overflow-x-auto pb-2 no-scrollbar">
-                    {[
-                        { label: '預設 (代號)', key: '代號' },
-                        { label: '市值', key: '市值' },
-                        { label: '股價', key: '現價' },
-                        { label: '股數', key: '股數' },
-                    ].map((option) => (
+        <div style={{ paddingBottom: 'var(--space-8)' }}>
+
+            {/* Sort chips (mobile + desktop) */}
+            <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-5)', flexWrap: 'wrap' }}>
+                {SORT_OPTIONS.map(opt => {
+                    const active = sortConfig.key === opt.key;
+                    return (
                         <button
-                            key={option.key}
-                            onClick={() => handleSort(option.key)}
-                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors border ${sortConfig.key === option.key
-                                    ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-                                    : 'bg-neutral-800 text-neutral-400 border-transparent hover:bg-neutral-700'
-                                }`}
+                            key={opt.key}
+                            onClick={() => handleSort(opt.key)}
+                            style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 4,
+                                padding: '6px 14px',
+                                borderRadius: 'var(--radius-pill)',
+                                border: 'none', cursor: 'pointer',
+                                background: active ? 'var(--color-primary-fixed)' : 'var(--color-surface-container-high)',
+                                color: active ? 'var(--color-on-primary-fixed)' : 'var(--color-on-surface-variant)',
+                                fontSize: 'var(--text-label-md-size)',
+                                fontWeight: 800,
+                                letterSpacing: '0.05em',
+                                textTransform: 'uppercase',
+                                transition: 'background 0.15s, transform 0.1s',
+                                fontFamily: 'var(--font-family)',
+                            }}
                         >
-                            {option.label}
-                            {sortConfig.key === option.key && (
+                            {opt.label}
+                            {active && (
                                 sortConfig.direction === 'asc'
-                                    ? <Icons.ArrowUp size={12} />
-                                    : <Icons.ArrowDown size={12} />
+                                    ? <Icons.ArrowUp size={11} />
+                                    : <Icons.ArrowDown size={11} />
                             )}
                         </button>
-                    ))}
-                </div>
+                    );
+                })}
+            </div>
 
+            {/* Mobile cards */}
+            <div className="md:hidden" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {sortedData.map((stock) => (
-                    <div key={stock.代號} className="bg-neutral-900/30 p-4 rounded-2xl border border-white/5 space-y-3">
-                        <div className="flex justify-between items-start">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-neutral-800 rounded-lg">
-                                    <Icons.Building2 size={18} className="text-neutral-400" />
+                    <div
+                        key={stock.代號}
+                        style={{
+                            background: 'var(--color-surface-container-lowest)',
+                            borderRadius: 'var(--radius-lg)',
+                            padding: 'var(--space-5)',
+                            boxShadow: 'var(--shadow-card)',
+                        }}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-4)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                                <div style={{
+                                    width: 40, height: 40, borderRadius: 'var(--radius-sm)',
+                                    background: 'var(--gradient-primary)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontWeight: 800, color: 'var(--color-on-primary-fixed)',
+                                }}>
+                                    {stock.股票名稱[0]}
                                 </div>
                                 <div>
-                                    <h3 className="font-bold">{stock.股票名稱}</h3>
-                                    <p className="text-xs text-neutral-500">{stock.代號}</p>
+                                    <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-on-surface)' }}>{stock.股票名稱}</p>
+                                    <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{stock.代號}</p>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <p className="font-mono font-bold text-lg">{formatCurrency(stock.市值)}</p>
-                                <p className="text-xs text-neutral-500">總市值</p>
+                            <div style={{ textAlign: 'right' }}>
+                                <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-title-md-size)', color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(stock.市值)}</p>
+                                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.04em' }}>總市值</p>
                             </div>
                         </div>
-                        <div className="h-px bg-white/5 w-full"></div>
-                        <div className="flex justify-between text-sm">
+
+                        {/* Divider via gap, not line */}
+                        <div style={{
+                            display: 'flex', justifyContent: 'space-between',
+                            background: 'var(--color-surface-container-high)',
+                            borderRadius: 'var(--radius-sm)',
+                            padding: 'var(--space-3) var(--space-4)',
+                        }}>
                             <div>
-                                <span className="text-neutral-500 text-xs block">持有股數</span>
-                                <span className="font-medium">{stock.股數}</span>
+                                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>持有股數</p>
+                                <p style={{ margin: '4px 0 0', fontWeight: 800, color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>{stock.股數?.toLocaleString()}</p>
                             </div>
-                            <div className="text-right">
-                                <span className="text-neutral-500 text-xs block">目前股價</span>
-                                <span className="font-medium text-blue-400">{stock.現價}</span>
+                            <div style={{ textAlign: 'right' }}>
+                                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>目前股價</p>
+                                <p style={{ margin: '4px 0 0', fontWeight: 800, color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>{stock.現價?.toLocaleString()}</p>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Desktop Table View */}
-            <div className="hidden md:block overflow-hidden rounded-3xl border border-white/5 bg-neutral-900/20">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-white/5 text-neutral-400 text-sm">
-                            <th
-                                className="px-6 py-4 font-medium cursor-pointer hover:text-white transition-colors select-none"
-                                onClick={() => handleSort(sortConfig.key === '代號' ? '股票名稱' : '代號')}
-                            >
-                                <div className="flex items-center gap-1">
-                                    名稱 / 代號
-                                    {(sortConfig.key === '代號' || sortConfig.key === '股票名稱') && (
-                                        sortConfig.direction === 'asc'
-                                            ? <Icons.ArrowUp size={14} className="text-blue-400" />
-                                            : <Icons.ArrowDown size={14} className="text-blue-400" />
-                                    )}
+            {/* Desktop table — styled as card list, no divider lines */}
+            <div
+                className="hidden md:block"
+                style={{
+                    background: 'var(--color-surface-container-low)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--space-4)',
+                }}
+            >
+                {/* Table header */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '2fr 1fr 1fr 1fr',
+                    padding: 'var(--space-2) var(--space-4)',
+                    marginBottom: 'var(--space-2)',
+                }}>
+                    <button style={colStyle.label} onClick={() => handleSort('代號')}>
+                        名稱 / 代號 <SortArrow colKey="代號" />
+                    </button>
+                    <button style={colStyle.label} onClick={() => handleSort('股數')}>
+                        持有股數 <SortArrow colKey="股數" />
+                    </button>
+                    <button style={colStyle.label} onClick={() => handleSort('現價')}>
+                        目前股價 <SortArrow colKey="現價" />
+                    </button>
+                    <button style={{ ...colStyle.label, justifyContent: 'flex-end' }} onClick={() => handleSort('市值')}>
+                        總市值 <SortArrow colKey="市值" />
+                    </button>
+                </div>
+
+                {/* Rows */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {sortedData.map((stock) => (
+                        <div
+                            key={stock.代號}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: '2fr 1fr 1fr 1fr',
+                                alignItems: 'center',
+                                background: 'var(--color-surface-container-lowest)',
+                                borderRadius: 'var(--radius-sm)',
+                                padding: 'var(--space-4)',
+                                boxShadow: 'var(--shadow-card)',
+                                transition: 'transform 0.12s ease, box-shadow 0.12s ease',
+                                cursor: 'default',
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.transform = 'scale(1.004)';
+                                e.currentTarget.style.boxShadow = 'var(--shadow-float)';
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = 'var(--shadow-card)';
+                            }}
+                        >
+                            {/* Name */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                                <div style={{
+                                    width: 36, height: 36, borderRadius: 'var(--radius-sm)',
+                                    background: 'var(--gradient-primary)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontWeight: 800, fontSize: '0.9rem',
+                                    color: 'var(--color-on-primary-fixed)',
+                                    flexShrink: 0,
+                                }}>
+                                    {stock.股票名稱[0]}
                                 </div>
-                            </th>
-                            <SortableHeader label="持有股數" sortKey="股數" />
-                            <SortableHeader label="目前股價" sortKey="現價" />
-                            <SortableHeader label="總市值" sortKey="市值" align="right" />
-                            <th className="px-6 py-4"></th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {sortedData.map((stock) => (
-                            <tr key={stock.代號} className="hover:bg-white/5 transition-colors group">
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-xs font-bold text-neutral-300">
-                                            {stock.股票名稱[0]}
-                                        </div>
-                                        <div>
-                                            <div className="font-bold text-sm">{stock.股票名稱}</div>
-                                            <div className="text-xs text-neutral-500">{stock.代號}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 text-sm font-medium text-neutral-300">{stock.股數}</td>
-                                <td className="px-6 py-4 text-sm font-medium text-blue-400">{stock.現價}</td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="font-bold">{formatCurrency(stock.市值)}</div>
-                                </td>
-                                <td className="px-6 py-4 text-right text-neutral-600">
-                                    <Icons.ChevronRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                <div>
+                                    <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-on-surface)' }}>{stock.股票名稱}</p>
+                                    <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em' }}>{stock.代號}</p>
+                                </div>
+                            </div>
+
+                            {/* Shares */}
+                            <p style={{ margin: 0, fontWeight: 500, color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>
+                                {stock.股數?.toLocaleString()}
+                            </p>
+
+                            {/* Price */}
+                            <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                                {stock.現價?.toLocaleString()}
+                            </p>
+
+                            {/* Value */}
+                            <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-on-surface)', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                                {formatCurrency(stock.市值)}
+                            </p>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

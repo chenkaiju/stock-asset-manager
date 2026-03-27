@@ -1,16 +1,303 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;800&display=swap');
 @import "tailwindcss";
 
+/* =====================================================
+   DESIGN TOKENS — "The Sun-Drenched Sanctuary"
+   ===================================================== */
 :root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* --- Surface Hierarchy --- */
+  --color-surface:                 #FEFCF1;  /* base layer */
+  --color-surface-container-low:   #FBFAEE;  /* section layer */
+  --color-surface-container-lowest:#FFFFFF;  /* active / card layer */
+  --color-surface-container:       #F6F4E7;  /* mid tier */
+  --color-surface-container-high:  #F0EEE1;  /* nested tags */
+  --color-surface-container-highest:#EAE9DB; /* input fill */
 
-  color-scheme: light dark;
+  /* --- Content Colors --- */
+  --color-on-surface:              #383831;
+  --color-on-surface-variant:      #6B6A60;
+  --color-on-background:           #383831;
+  --color-outline-variant:         rgba(187, 186, 176, 0.15); /* ghost border */
+
+  /* --- Primary (Golden) --- */
+  --color-primary:                 #7F6000;
+  --color-primary-fixed:           #F9CC61;
+  --color-on-primary-fixed:        #443100;
+
+  /* --- Secondary & Tertiary --- */
+  --color-secondary-container:     #FFC882;
+  --color-tertiary-container:      #F99681;
+
+  /* --- Gradient (primary CTA) --- */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary-fixed) 0%, var(--color-primary) 100%);
+
+  /* --- Border Radius --- */
+  --radius-sm:   16px;
+  --radius-lg:   32px;
+  --radius-btn:  24px;
+  --radius-pill: 999px;
+
+  /* --- Ambient Shadows (warm-tinted) --- */
+  --shadow-float:  0 12px 24px rgba(255, 209, 102, 0.15);
+  --shadow-card:   0 4px 12px rgba(56, 56, 49, 0.06);
+  --shadow-hover:  0 16px 32px rgba(255, 209, 102, 0.22);
+
+  /* --- Spacing Scale --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* --- Typography Scale --- */
+  --font-family: 'M PLUS Rounded 1c', system-ui, sans-serif;
+
+  --text-display-lg-size:    3.5rem;
+  --text-display-lg-weight:  800;
+  --text-display-lg-tracking: -0.02em;
+
+  --text-headline-md-size:   1.75rem;
+  --text-headline-md-weight: 800;
+  --text-headline-md-tracking: -0.01em;
+
+  --text-title-md-size:      1.125rem;
+  --text-title-md-weight:    800;
+
+  --text-body-lg-size:       1rem;
+  --text-body-lg-weight:     500;
+  --text-body-lg-tracking:   0.01em;
+
+  --text-label-md-size:      0.75rem;
+  --text-label-md-weight:    800;
+  --text-label-md-tracking:  0.05em;
+}
+
+/* =====================================================
+   GLOBAL BASE
+   ===================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at top left, #121212, #000000);
-  color: white;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-family);
+  font-size: var(--text-body-lg-size);
+  font-weight: var(--text-body-lg-weight);
+  letter-spacing: var(--text-body-lg-tracking);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =====================================================
+   TYPOGRAPHY UTILITIES
+   ===================================================== */
+.text-display-lg {
+  font-size: var(--text-display-lg-size);
+  font-weight: var(--text-display-lg-weight);
+  letter-spacing: var(--text-display-lg-tracking);
+  line-height: 1.1;
+  color: var(--color-on-surface);
+}
+
+.text-headline-md {
+  font-size: var(--text-headline-md-size);
+  font-weight: var(--text-headline-md-weight);
+  letter-spacing: var(--text-headline-md-tracking);
+  line-height: 1.2;
+  color: var(--color-on-surface);
+}
+
+.text-title-md {
+  font-size: var(--text-title-md-size);
+  font-weight: var(--text-title-md-weight);
+  line-height: 1.3;
+  color: var(--color-on-surface);
+}
+
+.text-body-lg {
+  font-size: var(--text-body-lg-size);
+  font-weight: var(--text-body-lg-weight);
+  letter-spacing: var(--text-body-lg-tracking);
+  color: var(--color-on-surface);
+}
+
+.text-label-md {
+  font-size: var(--text-label-md-size);
+  font-weight: var(--text-label-md-weight);
+  letter-spacing: var(--text-label-md-tracking);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+
+/* =====================================================
+   SURFACE / CARD UTILITIES
+   ===================================================== */
+.surface {
+  background-color: var(--color-surface);
+}
+
+.surface-low {
+  background-color: var(--color-surface-container-low);
+}
+
+.surface-card {
+  background-color: var(--color-surface-container-lowest);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.surface-section {
+  background-color: var(--color-surface-container-low);
+  border-radius: var(--radius-lg);
+}
+
+.surface-tag {
+  background-color: var(--color-surface-container-high);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-label-md-size);
+  font-weight: var(--text-label-md-weight);
+  letter-spacing: var(--text-label-md-tracking);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+
+/* =====================================================
+   AMBIENT SHADOW UTILITIES
+   ===================================================== */
+.shadow-float {
+  box-shadow: var(--shadow-float);
+}
+
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+/* =====================================================
+   BUTTON UTILITIES
+   ===================================================== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: var(--gradient-primary);
+  color: var(--color-on-primary-fixed);
+  font-family: var(--font-family);
+  font-size: var(--text-body-lg-size);
+  font-weight: 800;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-card);
+}
+
+.btn-primary:hover {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-secondary-container);
+  color: var(--color-on-primary-fixed);
+  font-family: var(--font-family);
+  font-size: var(--text-body-lg-size);
+  font-weight: 800;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-secondary:hover {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-card);
+}
+
+/* =====================================================
+   INPUT UTILITIES
+   ===================================================== */
+.input-pill {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-family);
+  font-size: var(--text-body-lg-size);
+  font-weight: var(--text-body-lg-weight);
+  color: var(--color-on-surface);
+  outline: none;
+  width: 100%;
+  transition: box-shadow 0.2s ease;
+}
+
+.input-pill:focus {
+  box-shadow: 0 0 0 4px rgba(249, 204, 97, 0.30);
+}
+
+.input-area {
+  background: var(--color-surface-container-highest);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  font-family: var(--font-family);
+  font-size: var(--text-body-lg-size);
+  font-weight: var(--text-body-lg-weight);
+  color: var(--color-on-surface);
+  outline: none;
+  width: 100%;
+  resize: vertical;
+  transition: box-shadow 0.2s ease;
+}
+
+.input-area:focus {
+  box-shadow: 0 0 0 4px rgba(249, 204, 97, 0.30);
+}
+
+/* =====================================================
+   GLASSMORPHISM UTILITY
+   ===================================================== */
+.glass {
+  background: rgba(254, 252, 241, 0.80);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* =====================================================
+   MOOD CHIP (Tertiary)
+   ===================================================== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-container-high);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-label-md-size);
+  font-weight: var(--text-label-md-weight);
+  letter-spacing: var(--text-label-md-tracking);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chip.active {
+  background: var(--color-tertiary-container);
+  color: var(--color-on-surface);
+  box-shadow: inset 0 1px 3px rgba(56, 56, 49, 0.20);
 }
