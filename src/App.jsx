@@ -8,8 +8,9 @@ import { PerformanceStats } from './components/PerformanceStats';
 import { ExchangeRates } from './components/ExchangeRates';
 
 // Heavy components using Recharts — loaded only when the tab is first visited
-const HistoryChart = lazy(() => import('./components/HistoryChart'));
-const MacroInsights = lazy(() => import('./components/MacroInsights'));
+// .then() wrapper needed because these use named exports, not default exports
+const HistoryChart = lazy(() => import('./components/HistoryChart').then(m => ({ default: m.HistoryChart })));
+const MacroInsights = lazy(() => import('./components/MacroInsights').then(m => ({ default: m.MacroInsights })));
 
 const TabFallback = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4rem', color: 'var(--color-on-surface-variant)' }}>
