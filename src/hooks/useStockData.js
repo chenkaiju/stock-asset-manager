@@ -39,7 +39,12 @@ export const useStockData = () => {
         if (!isBackground) setLoading(true);
         setError(null);
 
-        // 1. Fetch Private Data (Google Sheet)
+        // Fetch sheet data and public data (market + rates) in parallel
+        await Promise.all([fetchSheetData(), fetchPublicData()]);
+
+        if (!isBackground) setLoading(false);
+
+        async function fetchSheetData() {
         // 1. Fetch Private Data (Google Sheet)
         if (sheetUrl) {
             try {
@@ -227,24 +232,32 @@ export const useStockData = () => {
                 }
             }
         }
+        } // end fetchSheetData
 
-        // 2. Fetch Public Data (Market Index & Exchange Rates) - Independent of Sheet URL
+        // 2. Fetch Public Data (Market Index & Exchange Rates) - runs in parallel with sheet
+        async function fetchPublicData() {
         try {
-            // Fetch Market Data (TAIEX)
-            try {
-                const targetUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d';
-                const dataObj = await fetchWithProxy(targetUrl);
-                const result = dataObj.chart?.result?.[0];
+            // Fetch Market Data (TAIEX) and Exchange Rates in parallel
+            const currencies = ['USDTWD=X', 'EURTWD=X', 'JPYTWD=X', 'CNYTWD=X'];
+            const timestamp = new Date().getTime();
 
+            const [marketResult, ...rateResults] = await Promise.allSettled([
+                fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d`),
+                ...currencies.map(symbol =>
+                    fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`)
+                )
+            ]);
+
+            // Process Market Data
+            if (marketResult.status === 'fulfilled') {
+                const result = marketResult.value.chart?.result?.[0];
                 if (result) {
                     const meta = result.meta;
                     const price = Number(meta.regularMarketPrice);
                     const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
-
                     if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
                         const change = price - prevClose;
                         const percent = (change / prevClose) * 100;
-
                         setMarketData({
                             name: "台股加權",
                             index: price,
@@ -253,58 +266,42 @@ export const useStockData = () => {
                         });
                     }
                 }
-            } catch (mErr) {
-                console.error("Market fetch error:", mErr);
+            } else {
+                console.error("Market fetch error:", marketResult.reason);
             }
 
-            // Fetch Exchange Rates
-            const currencies = ['USDTWD=X', 'EURTWD=X', 'JPYTWD=X', 'CNYTWD=X'];
+            // Process Exchange Rates
             const ratesData = {};
-
-            try {
-                await Promise.all(currencies.map(async (symbol) => {
-                    try {
-                        const timestamp = new Date().getTime();
-                        const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`;
-
-                        const dataObj = await fetchWithProxy(targetUrl);
-                        const result = dataObj.chart?.result?.[0];
-
-                        if (result) {
-                            const meta = result.meta;
-                            const price = Number(meta.regularMarketPrice);
-                            const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
-
-                            if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
-                                const change = price - prevClose;
-                                const percent = (change / prevClose) * 100;
-                                const code = symbol.replace('TWD=X', '');
-                                ratesData[code] = {
-                                    price,
-                                    change: parseFloat(change.toFixed(4)),
-                                    percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
-                                };
-                            }
+            rateResults.forEach((settled, i) => {
+                if (settled.status === 'fulfilled') {
+                    const result = settled.value.chart?.result?.[0];
+                    if (result) {
+                        const meta = result.meta;
+                        const price = Number(meta.regularMarketPrice);
+                        const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+                        if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
+                            const change = price - prevClose;
+                            const percent = (change / prevClose) * 100;
+                            const code = currencies[i].replace('TWD=X', '');
+                            ratesData[code] = {
+                                price,
+                                change: parseFloat(change.toFixed(4)),
+                                percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
+                            };
                         }
-                    } catch (e) {
-                        console.warn(`Failed to fetch rate for ${symbol}:`, e);
                     }
-                    return null;
-                }));
-
-                if (Object.keys(ratesData).length > 0) {
-                    setExchangeRates(ratesData);
+                } else {
+                    console.warn(`Failed to fetch rate for ${currencies[i]}:`, settled.reason);
                 }
-            } catch (rateErr) {
-                console.error("Exchange rate fetch error:", rateErr);
+            });
+            if (Object.keys(ratesData).length > 0) {
+                setExchangeRates(ratesData);
             }
-
         } catch (publicErr) {
             console.error("Public data fetch error:", publicErr);
-        } finally {
-            if (!isBackground) setLoading(false);
         }
-    }, [sheetUrl]); // data dependency removed
+        } // end fetchPublicData
+    }, [sheetUrl]);
 
     useEffect(() => {
         // Initial fetch

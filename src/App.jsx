@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
@@ -26,14 +26,6 @@ export default function App() {
     totalValue,
     refresh
   } = useStockData();
-
-  // Setup periodic refresh
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refresh();
-    }, 60000); // Refresh every minute
-    return () => clearInterval(interval);
-  }, [refresh]);
 
   const renderContent = () => {
     switch (activeTab) {
