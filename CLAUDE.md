@@ -50,3 +50,5 @@ The user configures their own Google Sheet URL via the DataSource tab, stored in
 - **Symbol normalization**: Taiwan stocks automatically get `.TW` suffix appended for Yahoo Finance lookups
 - **Environment**: `VITE_FRED_API_KEY` is required for macro insights (FRED API)
 - The Vercel proxy whitelists only: `query1.finance.yahoo.com`, `query2.finance.yahoo.com`, `api.stlouisfed.org`
+- **Mock data**: `useStockData.js` initializes with hardcoded mock stocks/history so the UI renders without a configured sheet URL
+- **Google Sheets column headers are in Chinese**: `股票名稱` (name), `代號` (ticker), `股數` (shares), `現價` (price), `市值` (market value)
