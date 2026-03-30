@@ -265,7 +265,13 @@ export const Dashboard = ({ data, totalValue, marketData, historyData, loading }
                                     {stock.股票名稱[0]}
                                 </div>
                                 <div style={{ minWidth: 0 }}>
-                                    <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-body-lg-size)', color: 'var(--color-on-surface)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    <p style={{
+                                        margin: 0, fontWeight: 800, color: 'var(--color-on-surface)',
+                                        fontSize: stock.股票名稱.length <= 4 ? 'var(--text-body-lg-size)'
+                                            : stock.股票名稱.length <= 7 ? '0.88rem'
+                                            : '0.75rem',
+                                        whiteSpace: 'nowrap',
+                                    }}>
                                         {stock.股票名稱}
                                     </p>
                                     <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em' }}>
