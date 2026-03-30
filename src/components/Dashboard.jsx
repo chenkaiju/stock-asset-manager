@@ -253,10 +253,10 @@ export const Dashboard = ({ data, totalValue, marketData, historyData, loading }
                         >
                             {/* Avatar + Name */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', width: '30%' }}>
-                                <div style={{
+                                <div className="hidden md:flex" style={{
                                     width: 40, height: 40, borderRadius: 'var(--radius-sm)',
                                     background: 'var(--gradient-primary)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    alignItems: 'center', justifyContent: 'center',
                                     fontWeight: 800, fontSize: '1rem',
                                     color: 'var(--color-on-primary-fixed)',
                                     flexShrink: 0,
