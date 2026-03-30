@@ -13,7 +13,13 @@ const colStyle = {
     label: { color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-label-md-size)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', userSelect: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 },
 };
 
-export const StockList = ({ data }) => {
+const Sk = ({ w = '100%', h = 14, style = {} }) => (
+    <div className="skeleton" style={{ width: w, height: h, ...style }} />
+);
+
+const SKELETON_ROWS = 4;
+
+export const StockList = ({ data, loading }) => {
     const [sortConfig, setSortConfig] = React.useState({ key: '代號', direction: 'asc' });
 
     const handleSort = (key) => {
@@ -79,7 +85,24 @@ export const StockList = ({ data }) => {
 
             {/* Mobile cards */}
             <div className="md:hidden" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                {sortedData.map((stock) => (
+                {loading ? Array.from({ length: SKELETON_ROWS }).map((_, i) => (
+                    <div key={i} style={{ background: 'var(--color-surface-container-lowest)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', boxShadow: 'var(--shadow-card)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-4)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                                <Sk w={40} h={40} style={{ borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                    <Sk w={90} h={14} />
+                                    <Sk w={60} h={11} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                                <Sk w={80} h={18} />
+                                <Sk w={40} h={11} />
+                            </div>
+                        </div>
+                        <Sk w="100%" h={48} style={{ borderRadius: 'var(--radius-sm)' }} />
+                    </div>
+                )) : sortedData.map((stock) => (
                     <div
                         key={stock.代號}
                         style={{
@@ -162,7 +185,24 @@ export const StockList = ({ data }) => {
 
                 {/* Rows */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {sortedData.map((stock) => (
+                    {loading ? Array.from({ length: SKELETON_ROWS }).map((_, i) => (
+                        <div key={i} style={{
+                            display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', alignItems: 'center',
+                            background: 'var(--color-surface-container-lowest)', borderRadius: 'var(--radius-sm)',
+                            padding: 'var(--space-4)',
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                                <Sk w={36} h={36} style={{ borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                    <Sk w={100} h={14} />
+                                    <Sk w={60} h={11} />
+                                </div>
+                            </div>
+                            <Sk w={60} h={14} />
+                            <Sk w={60} h={14} />
+                            <Sk w={80} h={14} style={{ marginLeft: 'auto' }} />
+                        </div>
+                    )) : sortedData.map((stock) => (
                         <div
                             key={stock.代號}
                             style={{

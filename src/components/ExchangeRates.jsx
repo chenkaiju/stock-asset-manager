@@ -8,14 +8,50 @@ const CURRENCIES = [
     { code: 'CNY', name: '人民幣', flag: 'cn' },
 ];
 
+const SkeletonCard = () => (
+    <div style={{
+        background: 'var(--color-surface-container-lowest)',
+        borderRadius: 'var(--radius-lg)',
+        padding: 'var(--space-5)',
+        boxShadow: 'var(--shadow-card)',
+        display: 'flex', flexDirection: 'column', gap: 'var(--space-4)',
+    }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <div className="skeleton" style={{ width: 40, height: 40, borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                <div className="skeleton" style={{ width: '50%', height: 16 }} />
+                <div className="skeleton" style={{ width: '35%', height: 12 }} />
+            </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="skeleton" style={{ width: '60%', height: 32 }} />
+            <div className="skeleton" style={{ width: '45%', height: 14 }} />
+        </div>
+    </div>
+);
+
 export const ExchangeRates = ({ rates, loading }) => {
-    if (loading && (!rates || Object.keys(rates).length === 0)) {
+    const isEmpty = !rates || Object.keys(rates).length === 0;
+    if (loading && isEmpty) {
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-12)', color: 'var(--color-on-surface-variant)' }}>
-                <Icons.RefreshedCcw size={40} className="animate-spin" style={{ opacity: 0.4, marginBottom: 'var(--space-4)' }} />
-                <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-label-md-size)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                    載入匯率中...
-                </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                    <div className="skeleton" style={{ width: 44, height: 44, borderRadius: 'var(--radius-sm)' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div className="skeleton" style={{ width: 120, height: 20 }} />
+                        <div className="skeleton" style={{ width: 180, height: 14 }} />
+                    </div>
+                </div>
+                <div style={{
+                    background: 'var(--color-surface-container-low)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--space-4)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                    gap: 'var(--space-3)',
+                }}>
+                    {CURRENCIES.map(c => <SkeletonCard key={c.code} />)}
+                </div>
             </div>
         );
     }

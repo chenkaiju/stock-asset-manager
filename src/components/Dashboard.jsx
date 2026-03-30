@@ -2,7 +2,11 @@ import React from 'react';
 import { Icons } from './Icons';
 import { formatCurrency } from '../utils/formatters';
 
-export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
+const Sk = ({ w = '100%', h = 16, style = {} }) => (
+    <div className="skeleton" style={{ width: w, height: h, ...style }} />
+);
+
+export const Dashboard = ({ data, totalValue, marketData, historyData, loading }) => {
     const [showBalance, setShowBalance] = React.useState(false);
 
     const todayStr = new Date().toLocaleDateString('zh-TW', {
@@ -59,22 +63,31 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                         </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-4)' }}>
-                        <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>
-                            {marketData.index?.toLocaleString()}
-                        </span>
-                        <span style={{
-                            fontSize: 'var(--text-body-lg-size)',
-                            fontWeight: 800,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            color: marketData.change?.includes('-') ? '#2d7a4f' : '#c0392b',
-                        }}>
-                            {marketData.change?.includes('-')
-                                ? <Icons.ArrowDownRight size={16} />
-                                : <Icons.ArrowUpRight size={16} />}
-                            {marketData.change} ({marketData.percent})
-                        </span>
+                        {loading ? (
+                            <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+                                <Sk w={110} h={28} />
+                                <Sk w={80} h={18} />
+                            </div>
+                        ) : (
+                            <>
+                                <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>
+                                    {marketData.index?.toLocaleString()}
+                                </span>
+                                <span style={{
+                                    fontSize: 'var(--text-body-lg-size)',
+                                    fontWeight: 800,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    color: marketData.change?.includes('-') ? '#2d7a4f' : '#c0392b',
+                                }}>
+                                    {marketData.change?.includes('-')
+                                        ? <Icons.ArrowDownRight size={16} />
+                                        : <Icons.ArrowUpRight size={16} />}
+                                    {marketData.change} ({marketData.percent})
+                                </span>
+                            </>
+                        )}
                     </div>
                 </div>
             )}
@@ -192,7 +205,30 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                     flexDirection: 'column',
                     gap: 'var(--space-2)',
                 }}>
-                    {[...data].sort((a, b) => b.市值 - a.市值).slice(0, 10).map((stock) => (
+                    {loading ? Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: 'var(--space-4)',
+                            background: 'var(--color-surface-container-lowest)',
+                            borderRadius: 'var(--radius-sm)',
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', width: '30%' }}>
+                                <Sk w={40} h={40} style={{ borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                    <Sk w="80%" h={14} />
+                                    <Sk w="50%" h={11} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: '35%' }}>
+                                <Sk w={60} h={14} />
+                                <Sk w={80} h={11} />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, width: '35%' }}>
+                                <Sk w={80} h={14} />
+                                <Sk w={50} h={11} />
+                            </div>
+                        </div>
+                    )) : [...data].sort((a, b) => b.市值 - a.市值).slice(0, 10).map((stock) => (
                         <div
                             key={stock.代號}
                             style={{

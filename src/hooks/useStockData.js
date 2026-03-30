@@ -1,6 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchWithProxy } from '../utils/api';
 
+// --- Cache helpers (60s TTL) ---
+const CACHE_TTL_MS = 60_000;
+
+function loadCache(key) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const { ts, payload } = JSON.parse(raw);
+        if (Date.now() - ts < CACHE_TTL_MS) return payload;
+    } catch {}
+    return null;
+}
+
+function saveCache(key, payload) {
+    try {
+        localStorage.setItem(key, JSON.stringify({ ts: Date.now(), payload }));
+    } catch {}
+}
+
 // Mock Data
 const MOCK_DATA = [
     { "股票名稱": "台積電", "代號": "2330.TW", "股數": 1000, "現價": 620, "市值": 620000 },
@@ -35,9 +54,25 @@ export const useStockData = () => {
 
     // Define fetchData with useCallback so it can be reused
     const fetchData = useCallback(async (isBackground = false) => {
-        // Only show full loading state if not a background refresh
-        if (!isBackground) setLoading(true);
         setError(null);
+
+        if (!isBackground) {
+            // Hydrate from cache immediately so the UI shows real data before API responds
+            const publicCached = loadCache('stock_public');
+            const sheetCached = sheetUrl ? loadCache(`stock_sheet_${sheetUrl}`) : null;
+            if (publicCached) {
+                setMarketData(publicCached.marketData);
+                setExchangeRates(publicCached.exchangeRates);
+            }
+            if (sheetCached) {
+                setData(sheetCached.data);
+                setHistoryData(sheetCached.historyData);
+                setPerformanceStats(sheetCached.stats);
+            }
+            // Only show spinner when there's no cached data to display
+            const hasFreshCache = publicCached && (!sheetUrl || sheetCached);
+            if (!hasFreshCache) setLoading(true);
+        }
 
         // Fetch sheet data and public data (market + rates) in parallel
         await Promise.all([fetchSheetData(), fetchPublicData()]);
@@ -224,6 +259,7 @@ export const useStockData = () => {
                 setData(normalizedData);
                 setHistoryData(normalizedHistory);
                 setPerformanceStats(rawStats);
+                saveCache(`stock_sheet_${sheetUrl}`, { data: normalizedData, historyData: normalizedHistory, stats: rawStats });
             } catch (err) {
                 console.error("Fetch error:", err);
                 // Only set error state if it's not a background refresh (to avoid annoying popups)
@@ -249,6 +285,7 @@ export const useStockData = () => {
             ]);
 
             // Process Market Data
+            let newMarketData = null;
             if (marketResult.status === 'fulfilled') {
                 const result = marketResult.value.chart?.result?.[0];
                 if (result) {
@@ -258,12 +295,13 @@ export const useStockData = () => {
                     if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
                         const change = price - prevClose;
                         const percent = (change / prevClose) * 100;
-                        setMarketData({
+                        newMarketData = {
                             name: "台股加權",
                             index: price,
                             change: (change >= 0 ? "+" : "") + change.toFixed(2),
                             percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
-                        });
+                        };
+                        setMarketData(newMarketData);
                     }
                 }
             } else {
@@ -296,6 +334,11 @@ export const useStockData = () => {
             });
             if (Object.keys(ratesData).length > 0) {
                 setExchangeRates(ratesData);
+            }
+
+            // Persist to cache for next page load
+            if (newMarketData && Object.keys(ratesData).length > 0) {
+                saveCache('stock_public', { marketData: newMarketData, exchangeRates: ratesData });
             }
         } catch (publicErr) {
             console.error("Public data fetch error:", publicErr);

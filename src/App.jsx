@@ -1,13 +1,21 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { StockList } from './components/StockList';
-import { HistoryChart } from './components/HistoryChart';
 import { DataSource } from './components/DataSource';
 import { PerformanceStats } from './components/PerformanceStats';
 import { ExchangeRates } from './components/ExchangeRates';
-import { MacroInsights } from './components/MacroInsights';
+
+// Heavy components using Recharts — loaded only when the tab is first visited
+const HistoryChart = lazy(() => import('./components/HistoryChart'));
+const MacroInsights = lazy(() => import('./components/MacroInsights'));
+
+const TabFallback = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4rem', color: 'var(--color-on-surface-variant)' }}>
+    <div className="skeleton" style={{ width: 200, height: 20 }} />
+  </div>
+);
 
 import { useStockData } from './hooks/useStockData';
 
@@ -30,22 +38,21 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} />;
-      case 'stocks': // Renamed from 'list'
-        return <StockList data={data} />;
-      case 'history': // Existing tab
-        return <HistoryChart historyData={historyData} />;
-      case 'performance': // Existing tab
+        return <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} loading={loading} />;
+      case 'stocks':
+        return <StockList data={data} loading={loading} />;
+      case 'history':
+        return <Suspense fallback={<TabFallback />}><HistoryChart historyData={historyData} /></Suspense>;
+      case 'performance':
         return <PerformanceStats stats={performanceStats} />;
-
-      case 'rates': // Renamed from 'exchangerates'
+      case 'rates':
         return <ExchangeRates rates={exchangeRates} loading={loading} />;
-      case 'macro': // New tab
-        return <MacroInsights />;
-      case 'datasource': // Existing tab, renamed to 'settings' in snippet but keeping original for now
+      case 'macro':
+        return <Suspense fallback={<TabFallback />}><MacroInsights /></Suspense>;
+      case 'datasource':
         return <DataSource sheetUrl={sheetUrl} setSheetUrl={setSheetUrl} loading={loading} error={error} refresh={refresh} />;
       default:
-        return <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} />;
+        return <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} loading={loading} />;
     }
   };
 
