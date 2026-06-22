@@ -9,14 +9,15 @@ export const Header = ({ loading, error }) => {
           className="flex items-center gap-2 text-sm mb-6"
           style={{
             color: 'var(--color-primary)',
-            fontWeight: 800,
-            letterSpacing: 'var(--text-label-md-tracking)',
+            fontWeight: 700,
+            letterSpacing: '1px',
             textTransform: 'uppercase',
-            fontSize: 'var(--text-label-md-size)',
+            fontSize: '12px',
+            fontFamily: 'var(--font-family)',
           }}
         >
-          <Icons.RefreshedCcw size={14} className="animate-spin" style={{ color: 'var(--color-primary-fixed)' }} />
-          正在同步資料...
+          <Icons.RefreshedCcw size={14} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+          正在同步最新資料...
         </div>
       )}
 
@@ -24,15 +25,16 @@ export const Header = ({ loading, error }) => {
         <div
           className="mb-6 flex items-center gap-3"
           style={{
-            background: 'var(--color-surface-container-low)',
-            borderRadius: 'var(--radius-lg)',
+            background: 'var(--color-canvas)',
+            border: '1px solid var(--color-error)',
+            borderRadius: 'var(--radius-none)',
             padding: '1rem 1.5rem',
-            boxShadow: 'inset 0 0 0 1px var(--color-outline-variant)',
+            fontFamily: 'var(--font-family)',
           }}
         >
           <span style={{ fontSize: '1.1rem' }}>⚠️</span>
-          <span style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-lg-size)', fontWeight: 500 }}>
-            連線錯誤：{error}。請至設定頁確認 URL。
+          <span style={{ color: 'var(--color-error)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.5px' }}>
+            連線錯誤：{error}。請至「資料來源」確認部署網址。
           </span>
         </div>
       )}

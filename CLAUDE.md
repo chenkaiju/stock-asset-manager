@@ -50,3 +50,16 @@ The user configures their own Google Sheet URL via the DataSource tab, stored in
 - **Symbol normalization**: Taiwan stocks automatically get `.TW` suffix appended for Yahoo Finance lookups
 - **Environment**: `VITE_FRED_API_KEY` is required for macro insights (FRED API)
 - The Vercel proxy whitelists only: `query1.finance.yahoo.com`, `query2.finance.yahoo.com`, `api.stlouisfed.org`
+
+### UI & Design Guidelines (BMW Corporate Automotive Design System)
+
+- **Typography**: Uses the "Inter" font family.
+- **Aesthetic**: Clean, flat, premium, and structured. Avoid soft shadows, gradients, and rounded corners.
+- **Border Radius**: Strictly `0px` for all elements (`--radius-none`). Do not use rounded corners.
+- **Colors**: Relies on defined CSS custom properties in `index.css`:
+  - `--color-primary`: BMW Corporate Blue (`#1c69d4`)
+  - `--color-canvas`: White background (`#ffffff`)
+  - `--color-surface-soft`: Light grey panels (`#f7f7f7`)
+  - `--color-hairline`: Thin structural dividers (`#e6e6e6`)
+- **Spacing**: Uses `--space-*` variables (e.g., `--space-md`, `--space-lg`).
+- **Styling Method**: Styles are primarily inline or driven by structural utility classes. Tailwind CSS is present but primarily used for responsive breakpoints (`md:hidden`, `hidden md:block`) and grid layouts. Custom UI tokens must be referenced via CSS variables.

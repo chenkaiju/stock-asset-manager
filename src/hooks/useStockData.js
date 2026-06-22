@@ -97,10 +97,25 @@ export const useStockData = () => {
                                     const meta = result.meta;
                                     const price = Number(meta.regularMarketPrice);
                                     const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
-                                    // Extract Name, prefer longName (complete name), fallback to shortName or symbol
-                                    // Try to get Chinese name if available via the lang param
-                                    const name = meta.longName || meta.shortName || symbol;
+                                    
+                                    let name = meta.longName || meta.shortName || symbol;
 
+                                    // Try to get Chinese name via Search API for Taiwan stocks
+                                    if (symbol.endsWith('.TW') || symbol.endsWith('.TWO')) {
+                                        try {
+                                            const searchUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${symbol}&lang=zh-Hant-TW&region=TW&quotesCount=1`;
+                                            const searchObj = await fetchWithProxy(searchUrl);
+                                            const quote = searchObj.quotes?.[0];
+                                            if (quote) {
+                                                const longHasZh = /[\u4e00-\u9fa5]/.test(quote.longname || '');
+                                                const shortHasZh = /[\u4e00-\u9fa5]/.test(quote.shortname || '');
+                                                if (longHasZh) name = quote.longname;
+                                                else if (shortHasZh) name = quote.shortname;
+                                            }
+                                        } catch (searchErr) {
+                                            console.warn(`Failed to fetch Chinese name for ${symbol}`, searchErr);
+                                        }
+                                    }
 
                                     if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
                                         const change = price - prevClose;
@@ -134,10 +149,16 @@ export const useStockData = () => {
                 // Basic normalization to ensure numbers are numbers
                 const normalizedData = rawStocks.map(item => {
                     if (!item) return null; // Safety check
+                    
+                    // Skip empty rows from spreadsheet
+                    const hasSymbol = item["股票代碼"] || item["代號"];
+                    const hasName = item["股名"] || item["股票名稱"];
+                    if (!hasSymbol && !hasName) return null;
+
                     const quantity = Number(item["股數"]) || 0;
 
                     // Resolve Symbol
-                    let symbol = item["股票代碼"] || item["代號"] || "0000";
+                    let symbol = hasSymbol || "0000";
                     let lookupSymbol = String(symbol).trim();
                     // Match the same logic as above for consistency
                     if (!lookupSymbol.includes('.') && /^[0-9A-Z]{4,6}$/.test(lookupSymbol)) {
@@ -159,10 +180,16 @@ export const useStockData = () => {
                         ? quantity * price
                         : (Number(item["個股現值"]) || (quantity * price));
 
+                    // Determine Stock Name
+                    let sheetName = item["股名"] || item["股票名稱"];
+                    if (typeof sheetName === 'string' && (sheetName.includes("找不到") || sheetName === "#N/A" || sheetName === "Loading...")) {
+                        sheetName = null; // Ignore errors from sheet formulas
+                    }
+
                     return {
                         ...item,
                         // Internal App Keys mapped from Sheet Columns
-                        "股票名稱": item["股名"] || item["股票名稱"] || liveData?.name || "Unknown", // User column: 股名
+                        "股票名稱": sheetName || liveData?.name || "Unknown",
                         "代號": symbol,
                         "股數": quantity,
                         "現價": price,

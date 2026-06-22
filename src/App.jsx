@@ -58,10 +58,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen pb-24 md:pb-0 md:pl-64" style={{ background: 'var(--color-surface)', color: 'var(--color-on-surface)', fontFamily: 'var(--font-family)' }}>
+    <div className="min-h-screen pb-16" style={{ background: 'var(--color-canvas)', color: 'var(--color-ink)', fontFamily: 'var(--font-family)' }}>
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="max-w-7xl mx-auto p-4 md:p-10 pt-8 md:pt-10">
+      <main className="max-w-7xl mx-auto p-4 md:p-8 pt-6 md:pt-8">
         <Header loading={loading} error={error} />
         {renderContent()}
       </main>

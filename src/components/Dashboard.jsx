@@ -25,249 +25,238 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
     const isPositive = todayChange >= 0;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-
-            {/* Market Index */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+            
+            {/* Market Index Bar */}
             {marketData && (
                 <div
                     style={{
-                        background: 'var(--color-surface-container-low)',
-                        borderRadius: 'var(--radius-lg)',
-                        padding: 'var(--space-4) var(--space-6)',
+                        backgroundColor: 'var(--color-surface-soft)',
+                        border: '1px solid var(--color-hairline)',
+                        borderRadius: 'var(--radius-none)',
+                        padding: 'var(--space-md) var(--space-lg)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         flexWrap: 'wrap',
-                        gap: 'var(--space-4)',
+                        gap: 'var(--space-md)',
+                        fontFamily: 'var(--font-family)',
                     }}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                        <div style={{
-                            width: 40, height: 40,
-                            borderRadius: 'var(--radius-sm)',
-                            background: 'var(--color-surface-container-high)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: 'inset 0 1px 2px rgba(56,56,49,0.10)',
-                        }}>
-                            <Icons.TrendingUp size={18} style={{ color: 'var(--color-primary)' }} />
-                        </div>
-                        <div>
-                            <p className="text-label-md">Market Index</p>
-                            <h3 style={{ margin: 0, fontSize: 'var(--text-title-md-size)', fontWeight: 800, color: 'var(--color-on-surface)' }}>
-                                {marketData.name}
-                            </h3>
-                        </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
+                        <Icons.TrendingUp size={16} style={{ color: 'var(--color-primary)' }} />
+                        <span style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--color-ink)' }}>
+                            {marketData.name}
+                        </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-4)' }}>
-                        <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-md)' }}>
+                        <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-ink)', fontVariantNumeric: 'tabular-nums' }}>
                             {marketData.index?.toLocaleString()}
                         </span>
                         <span style={{
-                            fontSize: 'var(--text-body-lg-size)',
-                            fontWeight: 800,
+                            fontSize: '13px',
+                            fontWeight: 700,
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 4,
-                            color: marketData.change?.includes('-') ? '#2d7a4f' : '#c0392b',
+                            gap: '4px',
+                            color: marketData.change?.includes('-') ? 'var(--color-error)' : 'var(--color-success)',
                         }}>
                             {marketData.change?.includes('-')
-                                ? <Icons.ArrowDownRight size={16} />
-                                : <Icons.ArrowUpRight size={16} />}
+                                ? <Icons.ArrowDownRight size={14} />
+                                : <Icons.ArrowUpRight size={14} />}
                             {marketData.change} ({marketData.percent})
                         </span>
                     </div>
                 </div>
             )}
 
-            {/* Total Asset Card */}
+            {/* Total Asset Card - Hero Band Dark */}
             <div
+                className="hero-band-dark"
                 style={{
-                    background: 'var(--color-surface-container-lowest)',
-                    borderRadius: 'var(--radius-lg)',
-                    padding: 'var(--space-8)',
-                    boxShadow: 'var(--shadow-float)',
+                    padding: 'var(--space-xxl) var(--space-xl)',
                     position: 'relative',
-                    overflow: 'hidden',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                 }}
             >
-                {/* Warm glow decoration */}
-                <div style={{
-                    position: 'absolute', top: -60, right: -60,
-                    width: 200, height: 200,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(249,204,97,0.18) 0%, transparent 70%)',
-                    pointerEvents: 'none',
-                }} />
-
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+                <div style={{ maxWidth: '800px', width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-xs)', marginBottom: 'var(--space-md)' }}>
                         <Icons.Wallet size={16} style={{ color: 'var(--color-primary)' }} />
-                        <span className="text-label-md">總資產估值</span>
+                        <span style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'var(--color-on-dark-soft)' }}>
+                            總資產估值 (PORTFOLIO VALUE)
+                        </span>
                         <button
                             onClick={() => setShowBalance(!showBalance)}
                             style={{
-                                background: 'none', border: 'none', cursor: 'pointer',
-                                padding: '4px', borderRadius: 'var(--radius-pill)',
-                                color: 'var(--color-on-surface-variant)',
-                                display: 'flex', alignItems: 'center',
+                                background: 'none', 
+                                border: 'none', 
+                                cursor: 'pointer',
+                                padding: '4px', 
+                                color: 'var(--color-on-dark-soft)',
+                                display: 'flex', 
+                                alignItems: 'center',
                                 transition: 'color 0.15s',
                             }}
+                            onMouseEnter={e => e.currentTarget.style.color = 'var(--color-on-dark)'}
+                            onMouseLeave={e => e.currentTarget.style.color = 'var(--color-on-dark-soft)'}
                         >
                             {showBalance ? <Icons.Eye size={15} /> : <Icons.EyeOff size={15} />}
                         </button>
                     </div>
 
-                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-4)' }}>
-                        <h2 style={{
+                    <h2 
+                        className="text-display-xl"
+                        style={{
                             margin: 0,
-                            fontSize: 'clamp(1.75rem, 4vw, 3rem)',
-                            fontWeight: 800,
-                            letterSpacing: '-0.02em',
-                            color: 'var(--color-on-surface)',
+                            fontWeight: 700,
+                            color: 'var(--color-on-dark)',
                             fontVariantNumeric: 'tabular-nums',
-                        }}>
-                            {showBalance ? formatCurrency(totalValue) : '• • • • •'}
-                        </h2>
+                            marginBottom: 'var(--space-md)',
+                            fontSize: 'clamp(32px, 6vw, 64px)'
+                        }}
+                    >
+                        {showBalance ? formatCurrency(totalValue) : '• • • • • •'}
+                    </h2>
 
-                        {showBalance ? (
-                            <div style={{
-                                display: 'inline-flex', alignItems: 'center', gap: 6,
-                                padding: '6px 14px',
-                                borderRadius: 'var(--radius-pill)',
-                                background: isPositive
-                                    ? 'rgba(192, 57, 43, 0.10)'
-                                    : 'rgba(45, 122, 79, 0.10)',
-                                color: isPositive ? '#c0392b' : '#2d7a4f',
-                                fontSize: 'var(--text-body-lg-size)',
-                                fontWeight: 800,
-                            }}>
-                                {isPositive ? <Icons.ArrowUpRight size={15} /> : <Icons.ArrowDownRight size={15} />}
-                                {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
-                                &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
-                            </div>
-                        ) : (
-                            <div style={{
-                                display: 'inline-flex', alignItems: 'center',
-                                padding: '6px 14px',
-                                borderRadius: 'var(--radius-pill)',
-                                background: 'var(--color-surface-container-high)',
-                                color: 'var(--color-on-surface-variant)',
-                                fontSize: 'var(--text-label-md-size)',
-                                fontWeight: 800,
-                                letterSpacing: '0.05em',
-                            }}>
-                                ——
-                            </div>
-                        )}
-                    </div>
+                    {showBalance ? (
+                        <div style={{
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '8px',
+                            color: isPositive ? 'var(--color-success)' : 'var(--color-error)',
+                            fontSize: '14px',
+                            fontWeight: 700,
+                            letterSpacing: '0.5px'
+                        }}>
+                            {isPositive ? <Icons.ArrowUpRight size={16} /> : <Icons.ArrowDownRight size={16} />}
+                            {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
+                            &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
+                        </div>
+                    ) : (
+                        <div style={{
+                            display: 'inline-flex', 
+                            color: 'var(--color-on-dark-soft)',
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            letterSpacing: '1.5px',
+                        }}>
+                            ——
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Top Holdings */}
-            <section>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-                    <h4 style={{ margin: 0, fontSize: 'var(--text-title-md-size)', fontWeight: 800, color: 'var(--color-on-surface)' }}>
-                        主要持股
-                    </h4>
+            {/* Top Holdings Section */}
+            <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-hairline)', paddingBottom: 'var(--space-xs)' }}>
+                    <h3 className="text-title-lg" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        主要持股 (KEY HOLDINGS)
+                    </h3>
                     <span style={{
-                        background: 'var(--color-surface-container-high)',
-                        borderRadius: 'var(--radius-pill)',
-                        padding: '2px 10px',
-                        fontSize: 'var(--text-label-md-size)',
-                        fontWeight: 800,
-                        letterSpacing: '0.05em',
-                        color: 'var(--color-on-surface-variant)',
-                        textTransform: 'uppercase',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        letterSpacing: '1px',
+                        color: 'var(--color-muted)',
+                        textTransform: 'uppercase'
                     }}>
                         共 {data.length} 檔
                     </span>
                 </div>
 
-                <div style={{
-                    background: 'var(--color-surface-container-low)',
-                    borderRadius: 'var(--radius-lg)',
-                    overflow: 'hidden',
-                    padding: 'var(--space-4)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--space-2)',
-                }}>
-                    {[...data].sort((a, b) => b.市值 - a.市值).slice(0, 10).map((stock) => (
-                        <div
-                            key={stock.代號}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                padding: 'var(--space-4)',
-                                background: 'var(--color-surface-container-lowest)',
-                                borderRadius: 'var(--radius-sm)',
-                                boxShadow: 'var(--shadow-card)',
-                                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-                                cursor: 'pointer',
-                            }}
-                            onMouseEnter={e => {
-                                e.currentTarget.style.transform = 'scale(1.005)';
-                                e.currentTarget.style.boxShadow = 'var(--shadow-float)';
-                            }}
-                            onMouseLeave={e => {
-                                e.currentTarget.style.transform = 'scale(1)';
-                                e.currentTarget.style.boxShadow = 'var(--shadow-card)';
-                            }}
-                        >
-                            {/* Avatar + Name */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', width: '30%' }}>
-                                <div style={{
-                                    width: 40, height: 40, borderRadius: 'var(--radius-sm)',
-                                    background: 'var(--gradient-primary)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontWeight: 800, fontSize: '1rem',
-                                    color: 'var(--color-on-primary-fixed)',
-                                    flexShrink: 0,
-                                    boxShadow: 'var(--shadow-card)',
-                                }}>
-                                    {stock.股票名稱[0]}
+                {/* Grid layout matching model configuration cards (4-up) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[...data]
+                        .filter(stock => stock.股票名稱 !== '現金' && stock.代號 !== '0000')
+                        .sort((a, b) => b.市值 - a.市值)
+                        .slice(0, 10)
+                        .map((stock) => {
+                        const stockPositive = stock.當日漲跌 >= 0;
+                        return (
+                            <div
+                                key={stock.代號}
+                                className="model-card"
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 'var(--space-md)',
+                                    transition: 'border-color 0.15s ease',
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--color-hairline-strong)'}
+                                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--color-hairline)'}
+                            >
+                                {/* Silhouette / Visual Block */}
+                                <div className="model-card-photo" style={{ position: 'relative' }}>
+                                    <span style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-ink)', opacity: 0.08 }}>
+                                        {stock.代號.replace('.TW', '')}
+                                    </span>
+                                    {/* Tech visualization lines */}
+                                    <div style={{ position: 'absolute', bottom: '12px', left: '16px', right: '16px', height: '16px', display: 'flex', alignItems: 'flex-end', gap: '3px' }}>
+                                        <div style={{ flex: 1, height: '30%', backgroundColor: 'var(--color-surface-strong)' }} />
+                                        <div style={{ flex: 1, height: '50%', backgroundColor: 'var(--color-surface-strong)' }} />
+                                        <div style={{ flex: 1, height: '80%', backgroundColor: 'var(--color-surface-strong)' }} />
+                                        <div style={{ flex: 1, height: '40%', backgroundColor: 'var(--color-surface-strong)' }} />
+                                        <div style={{ flex: 1, height: '70%', backgroundColor: stockPositive ? 'var(--color-primary)' : 'var(--color-muted)' }} />
+                                    </div>
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '8px',
+                                        right: '8px',
+                                        fontSize: '11px',
+                                        fontWeight: 700,
+                                        color: stockPositive ? 'var(--color-success)' : 'var(--color-error)',
+                                        border: `1px solid ${stockPositive ? 'var(--color-success)' : 'var(--color-error)'}`,
+                                        padding: '2px 6px',
+                                        letterSpacing: '0.5px'
+                                    }}>
+                                        {stockPositive ? '▲' : '▼'} {Math.abs(stock.當日漲跌幅).toFixed(2)}%
+                                    </div>
                                 </div>
-                                <div style={{ minWidth: 0 }}>
-                                    <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-body-lg-size)', color: 'var(--color-on-surface)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+
+                                {/* Stock Details */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <h4 className="text-title-sm" style={{ margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                         {stock.股票名稱}
-                                    </p>
-                                    <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em' }}>
-                                        {stock.代號}
+                                    </h4>
+                                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-muted)', letterSpacing: '0.5px' }}>
+                                        代碼: {stock.代號} · {stock.股數?.toLocaleString()} 股
                                     </p>
                                 </div>
-                            </div>
 
-                            {/* Price + Change */}
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
-                                <p style={{
-                                    margin: 0, fontWeight: 800,
-                                    fontSize: 'var(--text-body-lg-size)',
-                                    color: stock.當日漲跌 >= 0 ? '#c0392b' : '#2d7a4f',
-                                    fontVariantNumeric: 'tabular-nums',
-                                }}>
-                                    {stock.現價?.toLocaleString()}
-                                </p>
-                                <p style={{
-                                    margin: 0, fontSize: '0.8rem', fontWeight: 500,
-                                    color: stock.當日漲跌 >= 0 ? 'rgba(192,57,43,0.75)' : 'rgba(45,122,79,0.75)',
-                                }}>
-                                    {stock.當日漲跌 > 0 ? '+' : ''}{Number(stock.當日漲跌).toFixed(2)}
-                                    &nbsp;({Number(stock.當日漲跌幅).toFixed(2)}%)
-                                </p>
-                            </div>
+                                {/* Price & Market Value */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 'auto', paddingTop: 'var(--space-xs)', borderTop: '1px solid var(--color-hairline)' }}>
+                                    <div>
+                                        <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>現價</p>
+                                        <p style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--color-ink)', fontVariantNumeric: 'tabular-nums' }}>
+                                            {stock.現價?.toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>市值</p>
+                                        <p style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                                            {formatCurrency(stock.市值)}
+                                        </p>
+                                    </div>
+                                </div>
 
-                            {/* Value + Shares */}
-                            <div style={{ textAlign: 'right', width: '35%' }}>
-                                <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-body-lg-size)', color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>
-                                    {formatCurrency(stock.市值)}
-                                </p>
-                                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, marginTop: 2, letterSpacing: '0.03em' }}>
-                                    {stock.股數?.toLocaleString()} 股
-                                </p>
+                                {/* UpperCase Text Link */}
+                                <div style={{ marginTop: 'var(--space-xs)' }}>
+                                    <a 
+                                        href={`https://tw.stock.yahoo.com/quote/${stock.代號.replace('.TW', '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn-text-link" 
+                                        style={{ fontSize: '11px', textDecoration: 'none' }}
+                                    >
+                                        LEARN MORE ›
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </section>
         </div>

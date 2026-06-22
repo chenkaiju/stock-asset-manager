@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icons } from './Icons';
 
 const NAV_ITEMS = [
@@ -12,97 +12,206 @@ const NAV_ITEMS = [
 ];
 
 export const Sidebar = ({ activeTab, setActiveTab }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
+        setIsOpen(false);
+    };
+
     return (
-        <nav
-            style={{
-                position: 'fixed',
-                zIndex: 50,
-                fontFamily: 'var(--font-family)',
-            }}
-            className="
-                bottom-0 left-0 right-0
-                md:top-0 md:bottom-0 md:right-auto md:w-64
-            "
-        >
-            {/* Glass panel */}
-            <div
-                className="glass"
+        <>
+            {/* Top Navigation Bar */}
+            <header
                 style={{
-                    height: '100%',
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '64px',
+                    backgroundColor: 'var(--color-canvas)',
+                    borderBottom: '1px solid var(--color-hairline)',
+                    zIndex: 100,
                     display: 'flex',
-                    flexDirection: 'column',
-                    padding: 'var(--space-3)',
-                    borderRight: '1px solid var(--color-outline-variant)',
-                    borderTop: '1px solid var(--color-outline-variant)',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0 var(--space-lg)',
+                    fontFamily: 'var(--font-family)',
                 }}
-                // Mobile: border-top only; desktop: border-right only (handled via className media)
             >
-                {/* Logo — desktop only */}
-                <div className="hidden md:flex" style={{ alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4) var(--space-3)', marginBottom: 'var(--space-6)' }}>
+                {/* Brand / Logo */}
+                <div 
+                    onClick={() => handleTabClick('dashboard')}
+                    style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 'var(--space-sm)',
+                        cursor: 'pointer',
+                        userSelect: 'none'
+                    }}
+                >
+                    {/* BMW Corporate Style Round Icon Placeholder */}
                     <div style={{
-                        width: 38, height: 38,
-                        borderRadius: 'var(--radius-sm)',
-                        background: 'var(--gradient-primary)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: 'var(--shadow-card)',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        border: '2px solid var(--color-ink)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: '14px',
+                        color: 'var(--color-ink)'
                     }}>
-                        <Icons.Wallet size={18} style={{ color: 'var(--color-on-primary-fixed)' }} />
+                        AF
                     </div>
                     <div>
-                        <h1 style={{ margin: 0, fontSize: 'var(--text-title-md-size)', fontWeight: 800, color: 'var(--color-on-surface)' }}>AssetFlow</h1>
-                        <p className="text-label-md" style={{ margin: 0 }}>Portfolio Tracker</p>
+                        <h1 style={{ margin: 0, fontSize: '16px', fontWeight: 700, letterSpacing: '0.5px', color: 'var(--color-ink)', lineHeight: 1.1 }}>
+                            AssetFlow
+                        </h1>
+                        <p style={{ margin: 0, fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 700 }}>
+                            Corporate Edition
+                        </p>
                     </div>
                 </div>
 
-                {/* Nav items */}
-                <div
-                    className="flex md:flex-col overflow-x-auto md:overflow-visible no-scrollbar"
-                    style={{ gap: 'var(--space-1)' }}
-                >
-                    {NAV_ITEMS.map(({ tab, label, Icon }) => {
+                {/* Desktop Menu - Center */}
+                <nav className="hidden md:flex" style={{ height: '100%', alignItems: 'center', gap: 'var(--space-lg)' }}>
+                    {NAV_ITEMS.map(({ tab, label }) => {
                         const active = activeTab === tab;
                         return (
                             <button
                                 key={tab}
-                                onClick={() => setActiveTab(tab)}
+                                onClick={() => handleTabClick(tab)}
                                 style={{
-                                    flexShrink: 0,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: 4,
-                                    padding: 'var(--space-3)',
-                                    borderRadius: 'var(--radius-sm)',
+                                    height: '100%',
+                                    background: 'transparent',
                                     border: 'none',
+                                    borderBottom: active ? '2px solid var(--color-primary)' : '2px solid transparent',
+                                    color: active ? 'var(--color-ink)' : 'var(--color-muted)',
+                                    fontSize: '14px',
+                                    fontWeight: active ? 700 : 400,
+                                    letterSpacing: '0.3px',
+                                    padding: '0 var(--space-xs)',
                                     cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    transition: 'color 0.15s ease, border-color 0.15s ease',
                                     fontFamily: 'var(--font-family)',
-                                    transition: 'background 0.15s, transform 0.1s',
-                                    background: active ? 'var(--color-primary-fixed)' : 'transparent',
-                                    color: active ? 'var(--color-on-primary-fixed)' : 'var(--color-on-surface-variant)',
-                                    transform: active ? 'scale(1)' : 'scale(1)',
-                                    minWidth: 56,
                                 }}
-                                className="md:flex-row md:justify-start md:gap-3 md:px-4"
-                                onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'var(--color-surface-container-high)'; }}
-                                onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+                                onMouseEnter={(e) => {
+                                    if (!active) e.currentTarget.style.color = 'var(--color-ink)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!active) e.currentTarget.style.color = 'var(--color-muted)';
+                                }}
                             >
-                                <Icon size={20} />
-                                <span style={{
-                                    fontSize: 'var(--text-label-md-size)',
-                                    fontWeight: 800,
-                                    letterSpacing: '0.03em',
-                                    whiteSpace: 'nowrap',
-                                }}
-                                    className="text-[10px] md:text-sm"
-                                >
-                                    {label}
-                                </span>
+                                {label}
                             </button>
                         );
                     })}
+                </nav>
+
+                {/* Right Area (Desktop) or Hamburger Toggle (Mobile) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                    {/* Live Sync Status Pill */}
+                    <div className="hidden lg:flex" style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: 'var(--color-success)',
+                        border: '1px solid var(--color-success)',
+                        padding: '4px 10px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                    }}>
+                        ONLINE
+                    </div>
+
+                    {/* Mobile Hamburger Toggle */}
+                    <button
+                        className="flex md:hidden"
+                        onClick={() => setIsOpen(!isOpen)}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-ink)',
+                            padding: 'var(--space-xs)',
+                        }}
+                    >
+                        {isOpen ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="4" y1="12" x2="20" y2="12" />
+                                <line x1="4" y1="6" x2="20" y2="6" />
+                                <line x1="4" y1="18" x2="20" y2="18" />
+                            </svg>
+                        )}
+                    </button>
                 </div>
-            </div>
-        </nav>
+            </header>
+
+            {/* Spacer to push content down below fixed nav */}
+            <div style={{ height: '64px' }} />
+
+            {/* Mobile Full-Screen Overlay Sheet Menu */}
+            {isOpen && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: '64px',
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'var(--color-canvas)',
+                        zIndex: 99,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        padding: 'var(--space-lg)',
+                        fontFamily: 'var(--font-family)',
+                        borderTop: '1px solid var(--color-hairline)',
+                    }}
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginTop: 'var(--space-md)' }}>
+                        {NAV_ITEMS.map(({ tab, label, Icon }) => {
+                            const active = activeTab === tab;
+                            return (
+                                <button
+                                    key={tab}
+                                    onClick={() => handleTabClick(tab)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 'var(--space-md)',
+                                        background: active ? 'var(--color-surface-soft)' : 'transparent',
+                                        border: 'none',
+                                        color: active ? 'var(--color-primary)' : 'var(--color-ink)',
+                                        fontSize: '18px',
+                                        fontWeight: active ? 700 : 300, /* Light 300 vs bold 700 */
+                                        padding: 'var(--space-md) var(--space-lg)',
+                                        textAlign: 'left',
+                                        width: '100%',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    <Icon size={20} style={{ color: active ? 'var(--color-primary)' : 'var(--color-muted)' }} />
+                                    <span>{label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <div style={{ marginTop: 'auto', borderTop: '1px solid var(--color-hairline)', paddingTop: 'var(--space-lg)', textAlign: 'center' }}>
+                        <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 700 }}>
+                            BMW Corporate Asset System
+                        </p>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };

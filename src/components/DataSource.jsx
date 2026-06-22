@@ -5,29 +5,32 @@ export const DataSource = ({ sheetUrl, setSheetUrl, error, loading, refresh }) =
     const connected = !error && sheetUrl && !loading;
 
     return (
-        <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', fontFamily: 'var(--font-family)' }}>
 
             {/* Main settings card */}
-            <div style={{ background: 'var(--color-surface-container-lowest)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-8)', boxShadow: 'var(--shadow-card)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 'var(--radius-sm)', background: 'var(--color-surface-container-high)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 1px 2px rgba(56,56,49,0.10)' }}>
-                        <Icons.Database size={22} style={{ color: 'var(--color-primary)' }} />
+            <div style={{ backgroundColor: 'var(--color-canvas)', border: '1px solid var(--color-hairline)', borderRadius: 'var(--radius-none)', padding: 'var(--space-lg)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-lg)' }}>
+                    <div style={{ width: 44, height: 44, border: '1px solid var(--color-hairline-strong)', backgroundColor: 'var(--color-surface-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icons.Database size={18} style={{ color: 'var(--color-primary)' }} />
                     </div>
                     <div>
-                        <h2 style={{ margin: 0, fontSize: 'var(--text-headline-md-size)', fontWeight: 800, color: 'var(--color-on-surface)' }}>資料來源設定</h2>
-                        <p className="text-label-md" style={{ margin: 0 }}>串接您的 Google Apps Script 以獲取即時資料</p>
+                        <h2 className="text-title-lg" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>資料來源設定 (DATA SOURCE)</h2>
+                        <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-muted)' }}>串接您的 Google Apps Script 以獲取即時持股與歷史數據</p>
                     </div>
                 </div>
 
-                <label className="text-label-md" style={{ display: 'block', marginBottom: 'var(--space-3)' }}>
+                <label 
+                    className="text-label-uppercase" 
+                    style={{ display: 'block', marginBottom: 'var(--space-xs)', fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '1px' }}
+                >
                     Google Apps Script Web App URL
                 </label>
 
-                <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
                     <input
                         type="text"
                         placeholder="https://script.google.com/macros/s/..."
-                        className="input-pill"
+                        className="text-input"
                         value={sheetUrl}
                         onChange={(e) => setSheetUrl(e.target.value)}
                         style={{ flex: 1 }}
@@ -38,43 +41,47 @@ export const DataSource = ({ sheetUrl, setSheetUrl, error, loading, refresh }) =
                         className="btn-primary"
                         style={{
                             flexShrink: 0,
-                            opacity: (loading || !sheetUrl) ? 0.5 : 1,
-                            cursor: (loading || !sheetUrl) ? 'not-allowed' : 'pointer',
+                            height: '48px',
                         }}
                     >
-                        <Icons.RefreshedCcw size={16} className={loading ? 'animate-spin' : ''} />
+                        <Icons.RefreshedCcw size={14} className={loading ? 'animate-spin' : ''} style={{ marginRight: '6px' }} />
                         {loading ? '同步中...' : '立即同步'}
                     </button>
                 </div>
 
                 {error && (
                     <div style={{
-                        marginTop: 'var(--space-5)',
-                        background: 'var(--color-surface-container-low)',
-                        borderRadius: 'var(--radius-lg)',
-                        padding: 'var(--space-4) var(--space-5)',
-                        display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)',
-                        boxShadow: 'inset 0 0 0 1px var(--color-outline-variant)',
+                        marginTop: 'var(--space-md)',
+                        background: 'var(--color-canvas)',
+                        border: '1px solid var(--color-error)',
+                        borderRadius: 'var(--radius-none)',
+                        padding: 'var(--space-md) var(--space-lg)',
+                        display: 'flex', 
+                        alignItems: 'flex-start', 
+                        gap: 'var(--space-xs)',
                     }}>
                         <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>⚠️</span>
                         <div>
-                            <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-on-surface)' }}>連線失敗</p>
-                            <p style={{ margin: '4px 0 0', fontWeight: 500, color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-lg-size)' }}>{error}</p>
+                            <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-error)', fontSize: '14px' }}>連線失敗</p>
+                            <p style={{ margin: '2px 0 0', fontWeight: 300, color: 'var(--color-muted)', fontSize: '13px' }}>{error}</p>
                         </div>
                     </div>
                 )}
 
                 {connected && (
                     <div style={{
-                        marginTop: 'var(--space-5)',
-                        background: 'var(--color-surface-container-low)',
-                        borderRadius: 'var(--radius-lg)',
-                        padding: 'var(--space-4) var(--space-5)',
-                        display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
+                        marginTop: 'var(--space-md)',
+                        backgroundColor: 'var(--color-surface-soft)',
+                        border: '1px solid var(--color-hairline)',
+                        borderRadius: 'var(--radius-none)',
+                        padding: 'var(--space-md) var(--space-lg)',
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 'var(--space-sm)',
                     }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#2d7a4f', flexShrink: 0, boxShadow: '0 0 0 3px rgba(45,122,79,0.2)' }} className="animate-pulse" />
-                        <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-lg-size)' }}>
-                            連線正常：已成功串接資料來源
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-success)', flexShrink: 0 }} />
+                        <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-success)', fontSize: '13px', letterSpacing: '0.5px' }}>
+                            STATUS: CONNECTED (已成功同步資料來源)
                         </p>
                     </div>
                 )}
@@ -82,29 +89,40 @@ export const DataSource = ({ sheetUrl, setSheetUrl, error, loading, refresh }) =
 
             {/* Setup guide */}
             <div style={{
-                background: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 'var(--space-4)',
+                backgroundColor: 'var(--color-surface-soft)',
+                border: '1px solid var(--color-hairline)',
+                borderRadius: 'var(--radius-none)',
+                padding: 'var(--space-md)',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-                gap: 'var(--space-3)',
+                gap: 'var(--space-sm)',
             }}>
                 {[
                     {
                         step: '01',
                         title: '部署 GAS 程式',
-                        body: <>請將 <code style={{ fontFamily: 'monospace', color: 'var(--color-primary)', fontSize: '0.85em' }}>backend/Code.js</code> 的內容複製到 Google Apps Script 編輯器，並部署為「網路應用程式」。</>
+                        body: <>請將 <code style={{ fontFamily: 'monospace', color: 'var(--color-primary)', fontSize: '0.9em' }}>backend/Code.js</code> 的內容複製到 Google Apps Script 編輯器，並部署為「網路應用程式」。</>
                     },
                     {
                         step: '02',
                         title: '取得網址',
-                        body: <>部署後的網址格式為 <code style={{ fontFamily: 'monospace', color: 'var(--color-primary)', fontSize: '0.85em' }}>https://script.google.com/macros/s/.../exec</code>。</>
+                        body: <>部署後的網址格式為 <code style={{ fontFamily: 'monospace', color: 'var(--color-primary)', fontSize: '0.9em' }}>https://script.google.com/macros/s/.../exec</code>。</>
                     },
                 ].map(({ step, title, body }) => (
-                    <div key={step} style={{ background: 'var(--color-surface-container-lowest)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-5)', boxShadow: 'var(--shadow-card)' }}>
-                        <p style={{ margin: '0 0 var(--space-2)', fontSize: 'var(--text-label-md-size)', fontWeight: 800, letterSpacing: '0.05em', color: 'var(--color-primary)' }}>{step}.</p>
-                        <h3 style={{ margin: '0 0 var(--space-3)', fontSize: 'var(--text-title-md-size)', fontWeight: 800, color: 'var(--color-on-surface)' }}>{title}</h3>
-                        <p style={{ margin: 0, fontSize: 'var(--text-body-lg-size)', fontWeight: 500, color: 'var(--color-on-surface-variant)', lineHeight: 1.6 }}>{body}</p>
+                    <div 
+                        key={step} 
+                        className="configurator-option-tile"
+                        style={{ 
+                            backgroundColor: 'var(--color-canvas)', 
+                            cursor: 'default',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 'var(--space-xs)'
+                        }}
+                    >
+                        <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, letterSpacing: '1px', color: 'var(--color-primary)' }}>STEP {step}.</p>
+                        <h3 className="text-title-sm" style={{ margin: 0, color: 'var(--color-ink)' }}>{title}</h3>
+                        <p style={{ margin: 0, fontSize: '13px', fontWeight: 300, color: 'var(--color-body)', lineHeight: 1.6 }}>{body}</p>
                     </div>
                 ))}
             </div>

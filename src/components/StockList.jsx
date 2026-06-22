@@ -9,10 +9,6 @@ const SORT_OPTIONS = [
     { label: '股數', key: '股數' },
 ];
 
-const colStyle = {
-    label: { color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-label-md-size)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', userSelect: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 },
-};
-
 export const StockList = ({ data }) => {
     const [sortConfig, setSortConfig] = React.useState({ key: '代號', direction: 'asc' });
 
@@ -26,7 +22,22 @@ export const StockList = ({ data }) => {
     const sortedData = React.useMemo(() => {
         if (!data) return [];
         return [...data].sort((a, b) => {
-            const av = a[sortConfig.key], bv = b[sortConfig.key];
+            let av = a[sortConfig.key];
+            let bv = b[sortConfig.key];
+            
+            if (av == null && bv == null) return 0;
+            if (av == null) return 1;
+            if (bv == null) return -1;
+            
+            if (typeof av === 'number' && isNaN(av)) av = 0;
+            if (typeof bv === 'number' && isNaN(bv)) bv = 0;
+            
+            if (typeof av === 'string' && typeof bv === 'string') {
+                return sortConfig.direction === 'asc' 
+                    ? av.localeCompare(bv) 
+                    : bv.localeCompare(av);
+            }
+            
             if (av < bv) return sortConfig.direction === 'asc' ? -1 : 1;
             if (av > bv) return sortConfig.direction === 'asc' ? 1 : -1;
             return 0;
@@ -36,37 +47,32 @@ export const StockList = ({ data }) => {
     const SortArrow = ({ colKey }) => {
         if (sortConfig.key !== colKey) return null;
         return sortConfig.direction === 'asc'
-            ? <Icons.ArrowUp size={12} style={{ color: 'var(--color-primary)' }} />
-            : <Icons.ArrowDown size={12} style={{ color: 'var(--color-primary)' }} />;
+            ? <Icons.ArrowUp size={12} style={{ color: 'var(--color-primary)', marginLeft: '4px' }} />
+            : <Icons.ArrowDown size={12} style={{ color: 'var(--color-primary)', marginLeft: '4px' }} />;
     };
 
     return (
-        <div style={{ paddingBottom: 'var(--space-8)' }}>
+        <div style={{ paddingBottom: 'var(--space-xl)', fontFamily: 'var(--font-family)' }}>
 
-            {/* Sort chips (mobile + desktop) */}
-            <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-5)', flexWrap: 'wrap' }}>
+            {/* Sort chips (RWD) */}
+            <div style={{ display: 'flex', gap: 'var(--space-xs)', marginBottom: 'var(--space-lg)', flexWrap: 'wrap' }}>
                 {SORT_OPTIONS.map(opt => {
                     const active = sortConfig.key === opt.key;
                     return (
                         <button
                             key={opt.key}
                             onClick={() => handleSort(opt.key)}
+                            className={`filter-chip ${active ? 'filter-chip-active' : ''}`}
                             style={{
-                                display: 'inline-flex', alignItems: 'center', gap: 4,
-                                padding: '6px 14px',
-                                borderRadius: 'var(--radius-pill)',
-                                border: 'none', cursor: 'pointer',
-                                background: active ? 'var(--color-primary-fixed)' : 'var(--color-surface-container-high)',
-                                color: active ? 'var(--color-on-primary-fixed)' : 'var(--color-on-surface-variant)',
-                                fontSize: 'var(--text-label-md-size)',
-                                fontWeight: 800,
-                                letterSpacing: '0.05em',
-                                textTransform: 'uppercase',
-                                transition: 'background 0.15s, transform 0.1s',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
                                 fontFamily: 'var(--font-family)',
                             }}
                         >
-                            {opt.label}
+                            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                {opt.label}
+                            </span>
                             {active && (
                                 sortConfig.direction === 'asc'
                                     ? <Icons.ArrowUp size={11} />
@@ -77,91 +83,174 @@ export const StockList = ({ data }) => {
                 })}
             </div>
 
-            {/* Mobile cards */}
-            <div className="md:hidden" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                {sortedData.map((stock) => (
-                    <div
-                        key={stock.代號}
-                        style={{
-                            background: 'var(--color-surface-container-lowest)',
-                            borderRadius: 'var(--radius-lg)',
-                            padding: 'var(--space-5)',
-                            boxShadow: 'var(--shadow-card)',
-                        }}
-                    >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-4)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                                <div style={{
-                                    width: 40, height: 40, borderRadius: 'var(--radius-sm)',
-                                    background: 'var(--gradient-primary)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontWeight: 800, color: 'var(--color-on-primary-fixed)',
-                                }}>
-                                    {stock.股票名稱[0]}
+            {/* Mobile cards (under 768px) */}
+            <div className="md:hidden">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                    {sortedData.map((stock) => {
+                        const stockPositive = stock.當日漲跌 >= 0;
+                        return (
+                            <div
+                                key={stock.代號}
+                                style={{
+                                    backgroundColor: 'var(--color-canvas)',
+                                    border: '1px solid var(--color-hairline)',
+                                    borderRadius: 'var(--radius-none)',
+                                    padding: 'var(--space-lg)',
+                                }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-md)' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
+                                        <div style={{
+                                            width: '36px',
+                                            height: '36px',
+                                            borderRadius: 'var(--radius-none)',
+                                            border: '1px solid var(--color-hairline-strong)',
+                                            backgroundColor: 'var(--color-surface-soft)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontWeight: 700,
+                                            color: 'var(--color-ink)',
+                                        }}>
+                                            {stock.股票名稱[0]}
+                                        </div>
+                                        <div>
+                                            <h4 className="text-title-sm" style={{ margin: 0 }}>{stock.股票名稱}</h4>
+                                            <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.5px' }}>{stock.代號}</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <p style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--color-ink)', fontVariantNumeric: 'tabular-nums' }}>
+                                            {formatCurrency(stock.市值)}
+                                        </p>
+                                        <p style={{ margin: 0, fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: 700 }}>總值</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-on-surface)' }}>{stock.股票名稱}</p>
-                                    <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{stock.代號}</p>
-                                </div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <p style={{ margin: 0, fontWeight: 800, fontSize: 'var(--text-title-md-size)', color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(stock.市值)}</p>
-                                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.04em' }}>總市值</p>
-                            </div>
-                        </div>
 
-                        {/* Divider via gap, not line */}
-                        <div style={{
-                            display: 'flex', justifyContent: 'space-between',
-                            background: 'var(--color-surface-container-high)',
-                            borderRadius: 'var(--radius-sm)',
-                            padding: 'var(--space-3) var(--space-4)',
-                        }}>
-                            <div>
-                                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>持有股數</p>
-                                <p style={{ margin: '4px 0 0', fontWeight: 800, color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>{stock.股數?.toLocaleString()}</p>
+                                {/* Detail row grid with hairline dividers */}
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 1fr',
+                                    borderTop: '1px solid var(--color-hairline)',
+                                    paddingTop: 'var(--space-sm)',
+                                    gap: 'var(--space-sm)'
+                                }}>
+                                    <div>
+                                        <p style={{ margin: 0, fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: 700 }}>持有股數</p>
+                                        <p style={{ margin: '2px 0 0', fontSize: '14px', fontWeight: 700, color: 'var(--color-ink)', fontVariantNumeric: 'tabular-nums' }}>{stock.股數?.toLocaleString()}</p>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <p style={{ margin: 0, fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: 700 }}>目前股價</p>
+                                        <p style={{ margin: '2px 0 0', fontSize: '14px', fontWeight: 700, color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                                            {stock.現價?.toLocaleString()}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>目前股價</p>
-                                <p style={{ margin: '4px 0 0', fontWeight: 800, color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>{stock.現價?.toLocaleString()}</p>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                        );
+                    })}
+                </div>
             </div>
 
-            {/* Desktop table — styled as card list, no divider lines */}
+            {/* Desktop table (768px and above) */}
             <div
                 className="hidden md:block"
                 style={{
-                    background: 'var(--color-surface-container-low)',
-                    borderRadius: 'var(--radius-lg)',
-                    padding: 'var(--space-4)',
+                    backgroundColor: 'var(--color-canvas)',
+                    border: '1px solid var(--color-hairline)',
+                    borderRadius: 'var(--radius-none)',
+                    overflow: 'hidden',
                 }}
             >
                 {/* Table header */}
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: '2fr 1fr 1fr 1fr',
-                    padding: 'var(--space-2) var(--space-4)',
-                    marginBottom: 'var(--space-2)',
+                    padding: 'var(--space-md) var(--space-lg)',
+                    borderBottom: '1px solid var(--color-hairline-strong)',
+                    backgroundColor: 'var(--color-surface-soft)',
                 }}>
-                    <button style={colStyle.label} onClick={() => handleSort('代號')}>
+                    <button 
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-ink)',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            letterSpacing: '1.5px',
+                            textTransform: 'uppercase',
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: 0,
+                            fontFamily: 'var(--font-family)',
+                        }}
+                        onClick={() => handleSort('代號')}
+                    >
                         名稱 / 代號 <SortArrow colKey="代號" />
                     </button>
-                    <button style={colStyle.label} onClick={() => handleSort('股數')}>
+                    <button 
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-ink)',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            letterSpacing: '1.5px',
+                            textTransform: 'uppercase',
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: 0,
+                            fontFamily: 'var(--font-family)',
+                        }}
+                        onClick={() => handleSort('股數')}
+                    >
                         持有股數 <SortArrow colKey="股數" />
                     </button>
-                    <button style={colStyle.label} onClick={() => handleSort('現價')}>
+                    <button 
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-ink)',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            letterSpacing: '1.5px',
+                            textTransform: 'uppercase',
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: 0,
+                            fontFamily: 'var(--font-family)',
+                        }}
+                        onClick={() => handleSort('現價')}
+                    >
                         目前股價 <SortArrow colKey="現價" />
                     </button>
-                    <button style={{ ...colStyle.label, justifyContent: 'flex-end' }} onClick={() => handleSort('市值')}>
+                    <button 
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-ink)',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            letterSpacing: '1.5px',
+                            textTransform: 'uppercase',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            padding: 0,
+                            fontFamily: 'var(--font-family)',
+                        }}
+                        onClick={() => handleSort('市值')}
+                    >
                         總市值 <SortArrow colKey="市值" />
                     </button>
                 </div>
 
-                {/* Rows */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                {/* Table Body Rows */}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {sortedData.map((stock) => (
                         <div
                             key={stock.代號}
@@ -169,52 +258,57 @@ export const StockList = ({ data }) => {
                                 display: 'grid',
                                 gridTemplateColumns: '2fr 1fr 1fr 1fr',
                                 alignItems: 'center',
-                                background: 'var(--color-surface-container-lowest)',
-                                borderRadius: 'var(--radius-sm)',
-                                padding: 'var(--space-4)',
-                                boxShadow: 'var(--shadow-card)',
-                                transition: 'transform 0.12s ease, box-shadow 0.12s ease',
+                                padding: 'var(--space-md) var(--space-lg)',
+                                borderBottom: '1px solid var(--color-hairline)',
+                                transition: 'background-color 0.1s ease',
                                 cursor: 'default',
                             }}
                             onMouseEnter={e => {
-                                e.currentTarget.style.transform = 'scale(1.004)';
-                                e.currentTarget.style.boxShadow = 'var(--shadow-float)';
+                                e.currentTarget.style.backgroundColor = 'var(--color-surface-soft)';
                             }}
                             onMouseLeave={e => {
-                                e.currentTarget.style.transform = 'scale(1)';
-                                e.currentTarget.style.boxShadow = 'var(--shadow-card)';
+                                e.currentTarget.style.backgroundColor = 'transparent';
                             }}
                         >
-                            {/* Name */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                            {/* Name & Code */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
                                 <div style={{
-                                    width: 36, height: 36, borderRadius: 'var(--radius-sm)',
-                                    background: 'var(--gradient-primary)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontWeight: 800, fontSize: '0.9rem',
-                                    color: 'var(--color-on-primary-fixed)',
-                                    flexShrink: 0,
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: 'var(--radius-none)',
+                                    border: '1px solid var(--color-hairline)',
+                                    backgroundColor: 'var(--color-canvas)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontWeight: 700,
+                                    fontSize: '13px',
+                                    color: 'var(--color-ink)',
                                 }}>
                                     {stock.股票名稱[0]}
                                 </div>
                                 <div>
-                                    <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-on-surface)' }}>{stock.股票名稱}</p>
-                                    <p style={{ margin: 0, fontSize: 'var(--text-label-md-size)', color: 'var(--color-on-surface-variant)', fontWeight: 800, letterSpacing: '0.05em' }}>{stock.代號}</p>
+                                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-ink)', fontSize: '14px' }}>
+                                        {stock.股票名稱}
+                                    </p>
+                                    <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.5px' }}>
+                                        {stock.代號}
+                                    </p>
                                 </div>
                             </div>
 
                             {/* Shares */}
-                            <p style={{ margin: 0, fontWeight: 500, color: 'var(--color-on-surface)', fontVariantNumeric: 'tabular-nums' }}>
+                            <p style={{ margin: 0, fontSize: '14px', fontWeight: 300, color: 'var(--color-body)', fontVariantNumeric: 'tabular-nums' }}>
                                 {stock.股數?.toLocaleString()}
                             </p>
 
                             {/* Price */}
-                            <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                            <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>
                                 {stock.現價?.toLocaleString()}
                             </p>
 
-                            {/* Value */}
-                            <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-on-surface)', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                            {/* Market Value */}
+                            <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--color-ink)', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
                                 {formatCurrency(stock.市值)}
                             </p>
                         </div>
