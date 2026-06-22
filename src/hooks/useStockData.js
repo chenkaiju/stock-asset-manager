@@ -1,6 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchWithProxy } from '../utils/api';
 
+// --- Cache helpers (60s TTL) ---
+const CACHE_TTL_MS = 60_000;
+
+function loadCache(key) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const { ts, payload } = JSON.parse(raw);
+        if (Date.now() - ts < CACHE_TTL_MS) return payload;
+    } catch {}
+    return null;
+}
+
+function saveCache(key, payload) {
+    try {
+        localStorage.setItem(key, JSON.stringify({ ts: Date.now(), payload }));
+    } catch {}
+}
+
 // Mock Data
 const MOCK_DATA = [
     { "股票名稱": "台積電", "代號": "2330.TW", "股數": 1000, "現價": 620, "市值": 620000 },
@@ -35,11 +54,32 @@ export const useStockData = () => {
 
     // Define fetchData with useCallback so it can be reused
     const fetchData = useCallback(async (isBackground = false) => {
-        // Only show full loading state if not a background refresh
-        if (!isBackground) setLoading(true);
         setError(null);
 
-        // 1. Fetch Private Data (Google Sheet)
+        if (!isBackground) {
+            // Hydrate from cache immediately so the UI shows real data before API responds
+            const publicCached = loadCache('stock_public');
+            const sheetCached = sheetUrl ? loadCache(`stock_sheet_${sheetUrl}`) : null;
+            if (publicCached) {
+                setMarketData(publicCached.marketData);
+                setExchangeRates(publicCached.exchangeRates);
+            }
+            if (sheetCached) {
+                setData(sheetCached.data);
+                setHistoryData(sheetCached.historyData);
+                setPerformanceStats(sheetCached.stats);
+            }
+            // Only show spinner when there's no cached data to display
+            const hasFreshCache = publicCached && (!sheetUrl || sheetCached);
+            if (!hasFreshCache) setLoading(true);
+        }
+
+        // Fetch sheet data and public data (market + rates) in parallel
+        await Promise.all([fetchSheetData(), fetchPublicData()]);
+
+        if (!isBackground) setLoading(false);
+
+        async function fetchSheetData() {
         // 1. Fetch Private Data (Google Sheet)
         if (sheetUrl) {
             try {
@@ -246,6 +286,7 @@ export const useStockData = () => {
                 setData(normalizedData);
                 setHistoryData(normalizedHistory);
                 setPerformanceStats(rawStats);
+                saveCache(`stock_sheet_${sheetUrl}`, { data: normalizedData, historyData: normalizedHistory, stats: rawStats });
             } catch (err) {
                 console.error("Fetch error:", err);
                 // Only set error state if it's not a background refresh (to avoid annoying popups)
@@ -254,84 +295,83 @@ export const useStockData = () => {
                 }
             }
         }
+        } // end fetchSheetData
 
-        // 2. Fetch Public Data (Market Index & Exchange Rates) - Independent of Sheet URL
+        // 2. Fetch Public Data (Market Index & Exchange Rates) - runs in parallel with sheet
+        async function fetchPublicData() {
         try {
-            // Fetch Market Data (TAIEX)
-            try {
-                const targetUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d';
-                const dataObj = await fetchWithProxy(targetUrl);
-                const result = dataObj.chart?.result?.[0];
+            // Fetch Market Data (TAIEX) and Exchange Rates in parallel
+            const currencies = ['USDTWD=X', 'EURTWD=X', 'JPYTWD=X', 'CNYTWD=X'];
+            const timestamp = new Date().getTime();
 
+            const [marketResult, ...rateResults] = await Promise.allSettled([
+                fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d`),
+                ...currencies.map(symbol =>
+                    fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`)
+                )
+            ]);
+
+            // Process Market Data
+            let newMarketData = null;
+            if (marketResult.status === 'fulfilled') {
+                const result = marketResult.value.chart?.result?.[0];
                 if (result) {
                     const meta = result.meta;
                     const price = Number(meta.regularMarketPrice);
                     const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
-
                     if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
                         const change = price - prevClose;
                         const percent = (change / prevClose) * 100;
-
-                        setMarketData({
+                        newMarketData = {
                             name: "台股加權",
                             index: price,
                             change: (change >= 0 ? "+" : "") + change.toFixed(2),
                             percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
-                        });
+                        };
+                        setMarketData(newMarketData);
                     }
                 }
-            } catch (mErr) {
-                console.error("Market fetch error:", mErr);
+            } else {
+                console.error("Market fetch error:", marketResult.reason);
             }
 
-            // Fetch Exchange Rates
-            const currencies = ['USDTWD=X', 'EURTWD=X', 'JPYTWD=X', 'CNYTWD=X'];
+            // Process Exchange Rates
             const ratesData = {};
-
-            try {
-                await Promise.all(currencies.map(async (symbol) => {
-                    try {
-                        const timestamp = new Date().getTime();
-                        const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`;
-
-                        const dataObj = await fetchWithProxy(targetUrl);
-                        const result = dataObj.chart?.result?.[0];
-
-                        if (result) {
-                            const meta = result.meta;
-                            const price = Number(meta.regularMarketPrice);
-                            const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
-
-                            if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
-                                const change = price - prevClose;
-                                const percent = (change / prevClose) * 100;
-                                const code = symbol.replace('TWD=X', '');
-                                ratesData[code] = {
-                                    price,
-                                    change: parseFloat(change.toFixed(4)),
-                                    percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
-                                };
-                            }
+            rateResults.forEach((settled, i) => {
+                if (settled.status === 'fulfilled') {
+                    const result = settled.value.chart?.result?.[0];
+                    if (result) {
+                        const meta = result.meta;
+                        const price = Number(meta.regularMarketPrice);
+                        const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+                        if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
+                            const change = price - prevClose;
+                            const percent = (change / prevClose) * 100;
+                            const code = currencies[i].replace('TWD=X', '');
+                            ratesData[code] = {
+                                price,
+                                change: parseFloat(change.toFixed(4)),
+                                percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
+                            };
                         }
-                    } catch (e) {
-                        console.warn(`Failed to fetch rate for ${symbol}:`, e);
                     }
-                    return null;
-                }));
-
-                if (Object.keys(ratesData).length > 0) {
-                    setExchangeRates(ratesData);
+                } else {
+                    console.warn(`Failed to fetch rate for ${currencies[i]}:`, settled.reason);
                 }
-            } catch (rateErr) {
-                console.error("Exchange rate fetch error:", rateErr);
+            });
+            if (Object.keys(ratesData).length > 0) {
+                setExchangeRates(ratesData);
             }
 
+            // Persist to cache for next page load
+            if (newMarketData && Object.keys(ratesData).length > 0) {
+                saveCache('stock_public', { marketData: newMarketData, exchangeRates: ratesData });
+            }
         } catch (publicErr) {
             console.error("Public data fetch error:", publicErr);
-        } finally {
-            if (!isBackground) setLoading(false);
         }
-    }, [sheetUrl]); // data dependency removed
+        } // end fetchPublicData
+    }, [sheetUrl]);
 
     useEffect(() => {
         // Initial fetch

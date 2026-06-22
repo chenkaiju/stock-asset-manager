@@ -444,3 +444,17 @@ body {
   border-width: 2px;
   padding: 15px 23px; /* account for 2px border */
 }
+
+/* =====================================================
+   SKELETON LOADER
+   ===================================================== */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+.skeleton {
+  background: var(--color-surface-container-high);
+  border-radius: 6px;
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
