@@ -50,27 +50,22 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                         userSelect: 'none'
                     }}
                 >
-                    {/* BMW Corporate Style Round Icon Placeholder */}
-                    <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        border: '2px solid var(--color-ink)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 700,
-                        fontSize: '14px',
-                        color: 'var(--color-ink)'
-                    }}>
-                        AF
-                    </div>
+                    {/* Brand Logo */}
+                    <img 
+                        src="/Stock-Logo.svg" 
+                        alt="Portfolio X Logo" 
+                        style={{
+                            width: '32px',
+                            height: '32px',
+                            objectFit: 'contain'
+                        }}
+                    />
                     <div>
                         <h1 style={{ margin: 0, fontSize: '16px', fontWeight: 700, letterSpacing: '0.5px', color: 'var(--color-ink)', lineHeight: 1.1 }}>
-                            AssetFlow
+                            Portfolio X
                         </h1>
                         <p style={{ margin: 0, fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 700 }}>
-                            Corporate Edition
+                            KAIJU CHEN
                         </p>
                     </div>
                 </div>

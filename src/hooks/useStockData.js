@@ -39,7 +39,12 @@ const MOCK_HISTORY = [
 export const useStockData = () => {
     const [data, setData] = useState(MOCK_DATA);
     const [historyData, setHistoryData] = useState(MOCK_HISTORY);
-    const [marketData, setMarketData] = useState({ name: "台股加權", index: 23500, change: "+150.5", percent: "+0.64%" });
+    const [marketData, setMarketData] = useState([
+        { symbol: "^TWII", name: "台灣加權指數", index: 23500, change: "+150.50", percent: "+0.64%" },
+        { symbol: "^TWOII", name: "上櫃指數", index: 320.50, change: "+1.20", percent: "+0.38%" },
+        { symbol: "^N225", name: "日經 225", index: 38500, change: "-210.50", percent: "-0.54%" },
+        { symbol: "^KS11", name: "韓國綜合", index: 2750, change: "+15.20", percent: "+0.55%" },
+    ]);
     const [loading, setLoading] = useState(false);
     const [sheetUrl, setSheetUrl] = useState(() => localStorage.getItem('sheetUrl') || '');
     const [error, setError] = useState(null);
@@ -300,39 +305,48 @@ export const useStockData = () => {
         // 2. Fetch Public Data (Market Index & Exchange Rates) - runs in parallel with sheet
         async function fetchPublicData() {
         try {
-            // Fetch Market Data (TAIEX) and Exchange Rates in parallel
+            // Fetch Market Data (Indices) and Exchange Rates in parallel
+            const indexSymbols = ['^TWII', '^TWOII', '^N225', '^KS11'];
+            const indexNames = ['台灣加權指數', '上櫃指數', '日經 225', '韓國綜合'];
             const currencies = ['USDTWD=X', 'EURTWD=X', 'JPYTWD=X', 'CNYTWD=X'];
             const timestamp = new Date().getTime();
 
-            const [marketResult, ...rateResults] = await Promise.allSettled([
-                fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/^TWII?interval=1d&range=1d`),
-                ...currencies.map(symbol =>
-                    fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`)
-                )
+            const fetchResults = await Promise.allSettled([
+                ...indexSymbols.map(sym => fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d&_t=${timestamp}`)),
+                ...currencies.map(symbol => fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`))
             ]);
 
-            // Process Market Data
-            let newMarketData = null;
-            if (marketResult.status === 'fulfilled') {
-                const result = marketResult.value.chart?.result?.[0];
-                if (result) {
-                    const meta = result.meta;
-                    const price = Number(meta.regularMarketPrice);
-                    const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
-                    if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
-                        const change = price - prevClose;
-                        const percent = (change / prevClose) * 100;
-                        newMarketData = {
-                            name: "台股加權",
-                            index: price,
-                            change: (change >= 0 ? "+" : "") + change.toFixed(2),
-                            percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
-                        };
-                        setMarketData(newMarketData);
+            const indexResults = fetchResults.slice(0, indexSymbols.length);
+            const rateResults = fetchResults.slice(indexSymbols.length);
+
+            // Process Market Indices
+            const newMarketData = [];
+            indexResults.forEach((settled, idx) => {
+                if (settled.status === 'fulfilled') {
+                    const result = settled.value.chart?.result?.[0];
+                    if (result) {
+                        const meta = result.meta;
+                        const price = Number(meta.regularMarketPrice);
+                        const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+                        if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
+                            const change = price - prevClose;
+                            const percent = (change / prevClose) * 100;
+                            newMarketData.push({
+                                symbol: indexSymbols[idx],
+                                name: indexNames[idx],
+                                index: price,
+                                change: (change >= 0 ? "+" : "") + change.toFixed(2),
+                                percent: (percent >= 0 ? "+" : "") + percent.toFixed(2) + "%"
+                            });
+                        }
                     }
+                } else {
+                    console.warn(`Failed to fetch index for ${indexSymbols[idx]}:`, settled.reason);
                 }
-            } else {
-                console.error("Market fetch error:", marketResult.reason);
+            });
+
+            if (newMarketData.length > 0) {
+                setMarketData(newMarketData);
             }
 
             // Process Exchange Rates
@@ -364,7 +378,7 @@ export const useStockData = () => {
             }
 
             // Persist to cache for next page load
-            if (newMarketData && Object.keys(ratesData).length > 0) {
+            if (newMarketData.length > 0 && Object.keys(ratesData).length > 0) {
                 saveCache('stock_public', { marketData: newMarketData, exchangeRates: ratesData });
             }
         } catch (publicErr) {

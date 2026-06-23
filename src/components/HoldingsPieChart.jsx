@@ -1,6 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatCurrency } from '../utils/formatters';
+import { Icons } from './Icons';
 
 const STOCKS_COLORS = [
     '#1c69d4', // BMW 經典藍 (Stock 1)
@@ -41,7 +42,7 @@ const CustomTooltip = ({ active, payload }) => {
     );
 };
 
-export const HoldingsPieChart = ({ data, totalValue }) => {
+export const HoldingsPieChart = ({ data, totalValue, todayChange, todayChangePercent, isPositive, showBalance, setShowBalance }) => {
     if (!data || data.length === 0 || !totalValue) {
         return null;
     }
@@ -121,10 +122,68 @@ export const HoldingsPieChart = ({ data, totalValue }) => {
             fontFamily: 'var(--font-family)',
         }}>
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid var(--color-hairline)', paddingBottom: 'var(--space-xs)' }}>
+            <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                borderBottom: '1px solid var(--color-hairline)', 
+                paddingBottom: 'var(--space-xs)',
+                flexWrap: 'wrap',
+                gap: 'var(--space-md)'
+            }}>
                 <h3 className="text-title-lg" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-ink)' }}>
                     資產配置
                 </h3>
+                
+                {/* 總資產估值 */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.5px', color: 'var(--color-muted)' }}>
+                            總資產估值
+                        </span>
+                        <button
+                            onClick={() => setShowBalance(!showBalance)}
+                            style={{
+                                background: 'none', 
+                                border: 'none', 
+                                cursor: 'pointer',
+                                padding: '2px', 
+                                color: 'var(--color-muted)',
+                                display: 'flex', 
+                                alignItems: 'center',
+                                transition: 'color 0.15s',
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = 'var(--color-ink)'}
+                            onMouseLeave={e => e.currentTarget.style.color = 'var(--color-muted)'}
+                        >
+                            {showBalance ? <Icons.Eye size={14} /> : <Icons.EyeOff size={14} />}
+                        </button>
+                    </div>
+
+                    <span style={{
+                        fontSize: '18px',
+                        fontWeight: 700,
+                        color: 'var(--color-ink)',
+                        fontVariantNumeric: 'tabular-nums'
+                    }}>
+                        {showBalance ? formatCurrency(totalValue) : '• • • • • •'}
+                    </span>
+
+                    {showBalance && (
+                        <span style={{
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            color: isPositive ? 'var(--color-trend-up)' : 'var(--color-trend-down)',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                        }}>
+                            {isPositive ? <Icons.TrendingUp size={12} /> : <Icons.TrendingDown size={12} />}
+                            {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
+                            &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
+                        </span>
+                    )}
+                </div>
             </div>
 
             {/* Content Section - Responsive Grid */}

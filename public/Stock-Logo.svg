@@ -1,0 +1,42 @@
+<svg width="512" height="512" viewBox="0 0 129 129" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stock asset monitor logo">
+  <defs>
+    <linearGradient id="gNavy" x1="22" y1="104" x2="82" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2A333E"></stop>
+      <stop offset="0.6" stop-color="#1E2630"></stop>
+      <stop offset="1" stop-color="#151A20"></stop>
+    </linearGradient>
+    <linearGradient id="gRim" x1="46" y1="24" x2="106" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity="0.42"></stop>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.05"></stop>
+    </linearGradient>
+  </defs>
+
+  
+  <path d="M58.9215 6.21167L23.1822 15.788C10.379 19.2186 2.78105 32.3787 6.21166 45.1819L15.788 80.9211C19.2186 93.7243 32.3787 101.322 45.1818 97.8917L80.9211 88.3154C93.7243 84.8848 101.322 71.7247 97.8917 58.9215L88.3154 23.1822C84.8847 10.379 71.7247 2.78107 58.9215 6.21167Z" fill="url(#gNavy)"></path>
+  <path d="M105.069 39.9361L69.33 30.3598C56.5268 26.9292 43.3667 34.5272 39.9361 47.3304L30.3598 83.0696C26.9292 95.8728 34.5272 109.033 47.3304 112.463L83.0696 122.04C95.8728 125.47 109.033 117.872 112.463 105.069L122.04 69.33C125.47 56.5268 117.872 43.3667 105.069 39.9361Z" fill="#0B0E12" fill-opacity="0.18" stroke="url(#gRim)" stroke-width="2"></path>
+
+  
+  <g stroke="#9AA6B4" fill="none" stroke-linecap="round">
+    <path d="M42.9 75 L65.1 49.9" stroke-width="1.4" stroke-opacity="0.5"></path>
+    <path d="M42.9 75 L79.3 74.4" stroke-width="1.2" stroke-opacity="0.34"></path>
+    <path d="M48.6 92 L65.1 49.9" stroke-width="1.2" stroke-opacity="0.34"></path>
+    <path d="M48.6 92 L79.3 74.4" stroke-width="1.2" stroke-opacity="0.34"></path>
+    <path d="M65.1 49.9 L79.3 74.4" stroke-width="1.5" stroke-opacity="0.55"></path>
+    <path d="M65.1 49.9 L101.5 65" stroke-width="1.5" stroke-opacity="0.55"></path>
+    <path d="M79.3 74.4 L101.5 65" stroke-width="1.5" stroke-opacity="0.55"></path>
+  </g>
+  <circle cx="101.5" cy="65" r="6.6" fill="none" stroke="#9AA6B4" stroke-opacity="0.4"></circle>
+  <g>
+    <circle cx="42.9" cy="75" r="3" fill="#C7D0DA"></circle>
+    <circle cx="48.6" cy="92" r="2.6" fill="#DCE2E8" fill-opacity="0.85"></circle>
+    <circle cx="65.1" cy="49.9" r="3.2" fill="#EEF2F6"></circle>
+    <circle cx="79.3" cy="74.4" r="2.8" fill="#DCE2E8"></circle>
+    <circle cx="101.5" cy="65" r="3" fill="#EEF2F6"></circle>
+  </g>
+
+  
+  <polyline points="22,88 44,72 60,84 82,50 102,32" fill="none" stroke="#ffffff" stroke-width="11.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+  <path d="M111 24 L109 40.5 L94.5 24.5 Z" fill="#ffffff" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round"></path>
+  <polyline points="22,88 44,72 60,84 82,50 102,32" fill="none" stroke="#E22718" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></polyline>
+  <path d="M111 24 L109 40.5 L94.5 24.5 Z" fill="#E22718"></path>
+</svg>

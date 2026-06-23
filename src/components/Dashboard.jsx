@@ -29,13 +29,13 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
             
             {/* Market Index Bar */}
-            {marketData && (
+            {marketData && Array.isArray(marketData) && marketData.length > 0 && (
                 <div
                     style={{
-                        backgroundColor: 'var(--color-surface-soft)',
-                        border: '1px solid var(--color-hairline)',
+                        backgroundColor: 'var(--color-canvas)',
+                        borderBottom: '1px solid var(--color-hairline)',
                         borderRadius: 'var(--radius-none)',
-                        padding: 'var(--space-md) var(--space-lg)',
+                        padding: 'var(--space-md) 0',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -44,116 +44,65 @@ export const Dashboard = ({ data, totalValue, marketData, historyData }) => {
                         fontFamily: 'var(--font-family)',
                     }}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-                        <Icons.TrendingUp size={16} style={{ color: 'var(--color-primary)' }} />
-                        <span style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--color-ink)' }}>
-                            {marketData.name}
-                        </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-md)' }}>
-                        <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-ink)', fontVariantNumeric: 'tabular-nums' }}>
-                            {marketData.index?.toLocaleString()}
-                        </span>
-                        <span style={{
-                            fontSize: '13px',
-                            fontWeight: 700,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            color: marketData.change?.includes('-') ? 'var(--color-trend-down)' : 'var(--color-trend-up)',
-                        }}>
-                            {marketData.change?.includes('-')
-                                ? <Icons.TrendingDown size={14} />
-                                : <Icons.TrendingUp size={14} />}
-                            {marketData.change} ({marketData.percent})
-                        </span>
+                    {/* Left: Section Title */}
+                    <h3 className="text-title-lg" style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-ink)' }}>
+                        市場動態
+                    </h3>
+
+                    {/* Right: Indices List */}
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-lg)' }}>
+                        {marketData.map((item, index) => {
+                            const isDown = item.change?.includes('-');
+                            const isLast = index === marketData.length - 1;
+                            return (
+                                <div 
+                                    key={item.symbol} 
+                                    style={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        gap: 'var(--space-xs)',
+                                        borderRight: isLast ? 'none' : '1px solid var(--color-hairline)',
+                                        paddingRight: isLast ? '0' : 'var(--space-lg)',
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ fontSize: '10px', color: 'var(--color-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            {item.name}
+                                        </span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
+                                            <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-ink)', fontVariantNumeric: 'tabular-nums' }}>
+                                                {item.index?.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                            </span>
+                                            <span style={{
+                                                fontSize: '11px',
+                                                fontWeight: 700,
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '2px',
+                                                color: isDown ? 'var(--color-trend-down)' : 'var(--color-trend-up)',
+                                            }}>
+                                                {isDown ? <Icons.TrendingDown size={11} /> : <Icons.TrendingUp size={11} />}
+                                                {item.percent}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}
 
-            {/* Total Asset Card - Flat Light Style */}
-            <div
-                style={{
-                    backgroundColor: 'var(--color-canvas)',
-                    borderBottom: '1px solid var(--color-hairline)',
-                    padding: 'var(--space-xl) var(--space-lg)',
-                    position: 'relative',
-                    textAlign: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <div style={{ maxWidth: '800px', width: '100%' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-xs)', marginBottom: 'var(--space-md)' }}>
-                        <Icons.Wallet size={16} style={{ color: 'var(--color-primary)' }} />
-                        <span style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'var(--color-muted)' }}>
-                            總資產估值 (PORTFOLIO VALUE)
-                        </span>
-                        <button
-                            onClick={() => setShowBalance(!showBalance)}
-                            style={{
-                                background: 'none', 
-                                border: 'none', 
-                                cursor: 'pointer',
-                                padding: '4px', 
-                                color: 'var(--color-muted)',
-                                display: 'flex', 
-                                alignItems: 'center',
-                                transition: 'color 0.15s',
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.color = 'var(--color-ink)'}
-                            onMouseLeave={e => e.currentTarget.style.color = 'var(--color-muted)'}
-                        >
-                            {showBalance ? <Icons.Eye size={15} /> : <Icons.EyeOff size={15} />}
-                        </button>
-                    </div>
-
-                    <h2 
-                        className="text-display-xl"
-                        style={{
-                            margin: 0,
-                            fontWeight: 700,
-                            color: 'var(--color-ink)',
-                            fontVariantNumeric: 'tabular-nums',
-                            marginBottom: 'var(--space-md)',
-                            fontSize: 'clamp(32px, 6vw, 64px)'
-                        }}
-                    >
-                        {showBalance ? formatCurrency(totalValue) : '• • • • • •'}
-                    </h2>
-
-                    {showBalance ? (
-                        <div style={{
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
-                            gap: '8px',
-                            color: isPositive ? 'var(--color-trend-up)' : 'var(--color-trend-down)',
-                            fontSize: '14px',
-                            fontWeight: 700,
-                            letterSpacing: '0.5px'
-                        }}>
-                            {isPositive ? <Icons.TrendingUp size={16} /> : <Icons.TrendingDown size={16} />}
-                            {isPositive ? '+' : ''}{Math.round(todayChange).toLocaleString()}
-                            &nbsp;({isPositive ? '+' : ''}{todayChangePercent.toFixed(2)}%)
-                        </div>
-                    ) : (
-                        <div style={{
-                            display: 'inline-flex', 
-                            color: 'var(--color-muted)',
-                            fontSize: '13px',
-                            fontWeight: 700,
-                            letterSpacing: '1.5px',
-                        }}>
-                            ——
-                        </div>
-                    )}
-                </div>
-            </div>
-
             {/* Asset Allocation Pie Chart */}
-            <HoldingsPieChart data={data} totalValue={totalValue} />
+            <HoldingsPieChart 
+                data={data} 
+                totalValue={totalValue} 
+                todayChange={todayChange}
+                todayChangePercent={todayChangePercent}
+                isPositive={isPositive}
+                showBalance={showBalance}
+                setShowBalance={setShowBalance}
+            />
 
             {/* Top Holdings Section */}
             <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
