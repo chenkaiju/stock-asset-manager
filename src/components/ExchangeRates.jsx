@@ -108,7 +108,7 @@ export const ExchangeRates = ({ rates, loading }) => {
                                     alignItems: 'center',
                                     gap: '2px',
                                     color: change
-                                        ? (isPositive ? 'var(--color-success)' : 'var(--color-error)')
+                                        ? (isPositive ? 'var(--color-trend-up)' : 'var(--color-trend-down)')
                                         : 'var(--color-muted)',
                                 }}>
                                     {change ? (

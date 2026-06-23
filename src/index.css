@@ -41,6 +41,8 @@
   --color-success:                 #22c55e;
   --color-warning:                 #f59e0b;
   --color-error:                   #dc2626;
+  --color-trend-up:                var(--color-error);   /* 紅漲 (Taiwan) */
+  --color-trend-down:              var(--color-success); /* 綠跌 (Taiwan) */
 
   /* --- Border Radius (All 0px per DESIGN.md) --- */
   --radius-none:                   0px;
