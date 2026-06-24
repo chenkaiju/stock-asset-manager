@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { StockList } from './components/StockList';
+import { DividendTab } from './components/DividendTab';
 import { DataSource } from './components/DataSource';
 import { PerformanceStats } from './components/PerformanceStats';
 import { ExchangeRates } from './components/ExchangeRates';
@@ -42,6 +43,8 @@ export default function App() {
         return <Dashboard data={data} totalValue={totalValue} marketData={marketData} historyData={historyData} loading={loading} />;
       case 'stocks':
         return <StockList data={data} loading={loading} />;
+      case 'dividend':
+        return <DividendTab data={data} />;
       case 'history':
         return <Suspense fallback={<TabFallback />}><HistoryChart historyData={historyData} /></Suspense>;
       case 'performance':

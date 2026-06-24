@@ -5,6 +5,7 @@ const NAV_ITEMS = [
     { tab: 'dashboard',  label: '概覽',    Icon: Icons.LayoutDashboard },
     { tab: 'history',    label: '趨勢分析', Icon: Icons.BarChart3 },
     { tab: 'stocks',     label: '持股清單', Icon: Icons.List },
+    { tab: 'dividend',   label: '除權息',   Icon: Icons.Banknote },
     { tab: 'performance',label: '績效分析', Icon: Icons.Activity },
     { tab: 'rates',      label: '匯率資訊', Icon: Icons.Globe },
     { tab: 'macro',      label: '總經觀察', Icon: Icons.TrendingUp },

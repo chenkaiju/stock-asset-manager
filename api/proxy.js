@@ -5,6 +5,8 @@ const ALLOWED_DOMAINS = [
   'query1.finance.yahoo.com',
   'query2.finance.yahoo.com',
   'api.stlouisfed.org',
+  'api.finmindtrade.com',
+  'tw.stock.yahoo.com',
 ];
 
 export default async function handler(req, res) {

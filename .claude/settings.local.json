@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(npm run:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebSearch",
+      "WebFetch(domain:developer.fugle.tw)",
+      "WebFetch(domain:openapi.twse.com.tw)",
+      "WebFetch(domain:www.twse.com.tw)"
     ]
   }
 }

@@ -118,7 +118,7 @@ export const useStockData = () => {
                         code = String(code).trim();
                         // If it looks like a Taiwan stock (4-5 digits, or digits+char, and no dot)
                         // optimize for common cases: 2330, 0050, 00940, 00733B
-                        if (!code.includes('.') && /^[0-9A-Z]{4,6}$/.test(code)) {
+                        if (!code.includes('.') && /^[0-9]{4,6}[A-Z]?$/.test(code)) {
                             return `${code}.TW`;
                         }
                         return code;
@@ -127,61 +127,82 @@ export const useStockData = () => {
                     const uniqueSymbols = [...new Set(symbols)];
 
                     if (uniqueSymbols.length > 0) {
-                        // Batch fetch failed, so we use Chart API (v8) for each symbol
-                        // This endpoint is more reliable but requires one request per stock
-
                         // Create a map to store results
                         const promises = uniqueSymbols.map(async (symbol) => {
+                            let dataObj = null;
+                            let finalSymbol = symbol;
+                            const timestamp = new Date().getTime();
+
                             try {
-                                const timestamp = new Date().getTime();
                                 const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&lang=zh-Hant-TW&region=TW&_t=${timestamp}`;
-                                const dataObj = await fetchWithProxy(chartUrl);
-                                const result = dataObj.chart?.result?.[0];
-
-                                if (result) {
-                                    const meta = result.meta;
-                                    const price = Number(meta.regularMarketPrice);
-                                    const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
-                                    
-                                    let name = meta.longName || meta.shortName || symbol;
-
-                                    // Try to get Chinese name via Search API for Taiwan stocks
-                                    if (symbol.endsWith('.TW') || symbol.endsWith('.TWO')) {
-                                        try {
-                                            const searchUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${symbol}&lang=zh-Hant-TW&region=TW&quotesCount=1`;
-                                            const searchObj = await fetchWithProxy(searchUrl);
-                                            const quote = searchObj.quotes?.[0];
-                                            if (quote) {
-                                                const longHasZh = /[\u4e00-\u9fa5]/.test(quote.longname || '');
-                                                const shortHasZh = /[\u4e00-\u9fa5]/.test(quote.shortname || '');
-                                                if (longHasZh) name = quote.longname;
-                                                else if (shortHasZh) name = quote.shortname;
-                                            }
-                                        } catch (searchErr) {
-                                            console.warn(`Failed to fetch Chinese name for ${symbol}`, searchErr);
-                                        }
-                                    }
-
-                                    if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
-                                        const change = price - prevClose;
-                                        const percent = (change / prevClose) * 100;
-
-                                        const data = {
-                                            price,
-                                            change,
-                                            changePercent: percent,
-                                            name: name // Store the fetched name
-                                        };
-
-                                        stockMap[symbol] = data;
-                                        // Also map without .TW
-                                        if (symbol.endsWith('.TW')) {
-                                            stockMap[symbol.replace('.TW', '')] = data;
-                                        }
-                                    }
-                                }
+                                dataObj = await fetchWithProxy(chartUrl);
                             } catch (e) {
-                                console.warn(`Failed to fetch chart for ${symbol}`, e);
+                                if (symbol.endsWith('.TW')) {
+                                    try {
+                                        finalSymbol = symbol.replace('.TW', '.TWO');
+                                        const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${finalSymbol}?interval=1d&range=1d&lang=zh-Hant-TW&region=TW&_t=${timestamp}`;
+                                        dataObj = await fetchWithProxy(chartUrl);
+                                    } catch (e2) {
+                                        console.warn(`Failed to fetch chart for ${symbol} and ${finalSymbol}`, e2);
+                                    }
+                                } else {
+                                    console.warn(`Failed to fetch chart for ${symbol}`, e);
+                                }
+                            }
+
+                            if (dataObj) {
+                                try {
+                                    const result = dataObj.chart?.result?.[0];
+                                    if (result) {
+                                        const meta = result.meta;
+                                        const price = Number(meta.regularMarketPrice);
+                                        const prevClose = Number(meta.chartPreviousClose || meta.previousClose);
+                                        
+                                        let name = meta.longName || meta.shortName || finalSymbol;
+
+                                        // Try to get Chinese name via Search API for Taiwan stocks
+                                        if (finalSymbol.endsWith('.TW') || finalSymbol.endsWith('.TWO')) {
+                                            try {
+                                                const searchUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${finalSymbol}&lang=zh-Hant-TW&region=TW&quotesCount=1`;
+                                                const searchObj = await fetchWithProxy(searchUrl);
+                                                const quote = searchObj.quotes?.[0];
+                                                if (quote) {
+                                                    const longHasZh = /[\u4e00-\u9fa5]/.test(quote.longname || '');
+                                                    const shortHasZh = /[\u4e00-\u9fa5]/.test(quote.shortname || '');
+                                                    if (longHasZh) name = quote.longname;
+                                                    else if (shortHasZh) name = quote.shortname;
+                                                }
+                                            } catch (searchErr) {
+                                                console.warn(`Failed to fetch Chinese name for ${finalSymbol}`, searchErr);
+                                            }
+                                        }
+
+                                        if (!isNaN(price) && !isNaN(prevClose) && prevClose !== 0) {
+                                            const change = price - prevClose;
+                                            const percent = (change / prevClose) * 100;
+
+                                            const data = {
+                                                price,
+                                                change,
+                                                changePercent: percent,
+                                                name: name
+                                            };
+
+                                            stockMap[finalSymbol] = data;
+                                            // Map without suffix
+                                            const cleanCode = finalSymbol.replace(/\.(TW|TWO)$/i, '');
+                                            stockMap[cleanCode] = data;
+                                            // Also map cross-suffixes to be safe
+                                            if (finalSymbol.endsWith('.TW')) {
+                                                stockMap[finalSymbol.replace('.TW', '.TWO')] = data;
+                                            } else if (finalSymbol.endsWith('.TWO')) {
+                                                stockMap[finalSymbol.replace('.TWO', '.TW')] = data;
+                                            }
+                                        }
+                                    }
+                                } catch (parseErr) {
+                                    console.error(`Failed to parse chart response for ${finalSymbol}`, parseErr);
+                                }
                             }
                         });
 
@@ -206,7 +227,7 @@ export const useStockData = () => {
                     let symbol = hasSymbol || "0000";
                     let lookupSymbol = String(symbol).trim();
                     // Match the same logic as above for consistency
-                    if (!lookupSymbol.includes('.') && /^[0-9A-Z]{4,6}$/.test(lookupSymbol)) {
+                    if (!lookupSymbol.includes('.') && /^[0-9]{4,6}[A-Z]?$/.test(lookupSymbol)) {
                         lookupSymbol += '.TW';
                     }
 
