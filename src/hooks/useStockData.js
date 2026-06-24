@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchWithProxy } from '../utils/api';
 
-// --- Cache helpers (60s TTL) ---
-const CACHE_TTL_MS = 60_000;
+// --- Cache helpers (24h TTL) ---
+// Prices don't need to be real-time; once per day is sufficient for a portfolio tracker.
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function loadCache(key) {
     try {
@@ -409,15 +410,17 @@ export const useStockData = () => {
     }, [sheetUrl]);
 
     useEffect(() => {
-        // Initial fetch
+        // Initial fetch on mount
         fetchData(false);
 
-        // Set up polling every 60 seconds
+        // Background refresh once every 24 hours.
+        // Users can also manually refresh via the UI button at any time.
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         const intervalId = setInterval(() => {
             fetchData(true);
-        }, 60000);
+        }, ONE_DAY_MS);
 
-        // Cleanup interval on unmount or when sheetUrl changes
+        // Cleanup on unmount or when sheetUrl changes
         return () => clearInterval(intervalId);
     }, [fetchData]);
 

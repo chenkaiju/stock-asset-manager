@@ -53,7 +53,10 @@ export const DividendTab = ({ data }) => {
         setRows([]);
         setProgress({ done: 0, total: data.length, errors: 0 });
 
-        const currentYear = new Date().getFullYear();
+        // Use Taiwan date (UTC+8) for all date comparisons
+        const nowTW = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+        const todayTW = new Date(nowTW.getFullYear(), nowTW.getMonth(), nowTW.getDate()); // midnight today TW
+        const currentYear = nowTW.getFullYear();
         let done = 0;
         let errors = 0;
 
@@ -78,13 +81,18 @@ export const DividendTab = ({ data }) => {
 
                     if (!twDividends) return [];
 
-                    // Only keep SUB records (individual distribution events) with a real ex-date in the current year.
-                    // YEAR records are annual roll-up summaries — they may not have individual dates.
+                    // Only keep SUB records (individual distribution events) with:
+                    //   - a real ex-date in the current year
+                    //   - ex-date <= today (Taiwan time) — future dates are hidden until they arrive
                     const yearRows = twDividends.filter((d) => {
                         if (d.recordType !== 'SUB') return false;
                         const exStr = d.exDate || d.exDividend?.date;
                         if (!exStr) return false;
-                        return new Date(exStr).getFullYear() === currentYear;
+                        const exD = new Date(exStr);
+                        if (exD.getFullYear() !== currentYear) return false;
+                        // Compare date-only (strip time) against today TW midnight
+                        const exMidnight = new Date(exD.getFullYear(), exD.getMonth(), exD.getDate());
+                        return exMidnight <= todayTW; // hide future ex-dates
                     });
 
                     return yearRows.map((d) => {
@@ -111,6 +119,10 @@ export const DividendTab = ({ data }) => {
                             }
                         }
 
+                        // Check if ex-date is today (Taiwan time)
+                        const exMidnight = new Date(exDateObj.getFullYear(), exDateObj.getMonth(), exDateObj.getDate());
+                        const isToday = exMidnight.getTime() === todayTW.getTime();
+
                         return {
                             名稱: stock['股票名稱'],
                             代號: raw,
@@ -118,6 +130,7 @@ export const DividendTab = ({ data }) => {
                             股票股利: stockDividend,
                             exDate: exDateFmt,
                             payDate: payDateFmt,
+                            isToday,
                             exTs: exDateObj.getTime() / 1000,
                         };
                     });
@@ -354,29 +367,65 @@ export const DividendTab = ({ data }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {rows.map((r, i) => (
-                                <tr
-                                    key={i}
-                                    style={{ backgroundColor: i % 2 === 0 ? 'var(--color-canvas)' : 'var(--color-surface-soft)' }}
-                                >
-                                    <td style={{ ...cellStyle, textAlign: 'right', color: 'var(--color-muted)', fontSize: '12px' }}>
-                                        {r.exDate}
-                                    </td>
-                                    <td style={{ ...cellStyle, textAlign: 'right', color: 'var(--color-muted)', fontSize: '12px' }}>
-                                        {r.payDate ?? '--'}
-                                    </td>
-                                    <td style={{ ...cellStyle, textAlign: 'left', fontWeight: 600 }}>{r.名稱}</td>
-                                    <td style={{ ...cellStyle, textAlign: 'right', fontFamily: 'monospace', color: 'var(--color-muted)' }}>
-                                        {r.代號}
-                                    </td>
-                                    <td style={{ ...cellStyle, textAlign: 'right', color: 'var(--color-primary)', fontWeight: 700 }}>
-                                        {fmt(r.現金股利)}
-                                    </td>
-                                    <td style={{ ...cellStyle, textAlign: 'right', color: r.股票股利 != null ? 'var(--color-primary)' : 'var(--color-muted)' }}>
-                                        {r.股票股利 != null ? fmt(r.股票股利, 4) : '--'}
-                                    </td>
-                                </tr>
-                            ))}
+                            {rows.map((r, i) => {
+                                const todayRowStyle = r.isToday
+                                    ? {
+                                        backgroundColor: 'rgba(251, 191, 36, 0.12)', // amber-200 tint
+                                        borderLeft: '3px solid #f59e0b',             // amber-500 accent
+                                        boxShadow: 'inset 0 0 0 1px rgba(251,191,36,0.25)',
+                                    }
+                                    : {
+                                        backgroundColor: i % 2 === 0 ? 'var(--color-canvas)' : 'var(--color-surface-soft)',
+                                        borderLeft: '3px solid transparent',
+                                    };
+
+                                return (
+                                    <tr key={i} style={todayRowStyle}>
+                                        <td style={{ ...cellStyle, textAlign: 'right', fontSize: '12px',
+                                            color: r.isToday ? '#92400e' : 'var(--color-muted)' }}>
+                                            {r.isToday && (
+                                                <span style={{
+                                                    display: 'inline-block',
+                                                    marginRight: '6px',
+                                                    padding: '1px 6px',
+                                                    fontSize: '10px',
+                                                    fontWeight: 700,
+                                                    letterSpacing: '0.5px',
+                                                    backgroundColor: '#f59e0b',
+                                                    color: '#fff',
+                                                    borderRadius: '3px',
+                                                    verticalAlign: 'middle',
+                                                }}>
+                                                    今日
+                                                </span>
+                                            )}
+                                            {r.exDate}
+                                        </td>
+                                        <td style={{ ...cellStyle, textAlign: 'right', color: 'var(--color-muted)', fontSize: '12px' }}>
+                                            {r.payDate ?? '--'}
+                                        </td>
+                                        <td style={{ ...cellStyle, textAlign: 'left',
+                                            fontWeight: r.isToday ? 700 : 600,
+                                            color: r.isToday ? '#92400e' : 'var(--color-ink)' }}>
+                                            {r.名稱}
+                                        </td>
+                                        <td style={{ ...cellStyle, textAlign: 'right', fontFamily: 'monospace',
+                                            color: r.isToday ? '#b45309' : 'var(--color-muted)' }}>
+                                            {r.代號}
+                                        </td>
+                                        <td style={{ ...cellStyle, textAlign: 'right', fontWeight: 700,
+                                            color: r.isToday ? '#b45309' : 'var(--color-primary)' }}>
+                                            {fmt(r.現金股利)}
+                                        </td>
+                                        <td style={{ ...cellStyle, textAlign: 'right',
+                                            color: r.股票股利 != null
+                                                ? (r.isToday ? '#b45309' : 'var(--color-primary)')
+                                                : 'var(--color-muted)' }}>
+                                            {r.股票股利 != null ? fmt(r.股票股利, 4) : '--'}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
