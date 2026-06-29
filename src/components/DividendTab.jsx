@@ -81,12 +81,13 @@ export const DividendTab = ({ data }) => {
 
                     if (!twDividends) return [];
 
-                    // Only keep SUB records (individual distribution events) with:
+                    // Only keep individual distribution events with:
                     //   - a real ex-date in the current year
                     //   - ex-date <= today (Taiwan time) — future dates are hidden until they arrive
+                    // (Note: we don't check for recordType === 'SUB' because single-annual-dividend
+                    // stocks only have 'YEAR' records, while ETFs have both 'YEAR' (without dates) and 'SUB' (with dates))
                     const yearRows = twDividends.filter((d) => {
-                        if (d.recordType !== 'SUB') return false;
-                        const exStr = d.exDate || d.exDividend?.date;
+                        const exStr = d.exDate || d.exDividend?.date || d.exRight?.date;
                         if (!exStr) return false;
                         const exD = new Date(exStr);
                         if (exD.getFullYear() !== currentYear) return false;
@@ -96,7 +97,7 @@ export const DividendTab = ({ data }) => {
                     });
 
                     return yearRows.map((d) => {
-                        const exStr = d.exDate || d.exDividend?.date;
+                        const exStr = d.exDate || d.exDividend?.date || d.exRight?.date;
                         const exDateObj = new Date(exStr);
                         const exDateFmt = exDateObj.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
 
