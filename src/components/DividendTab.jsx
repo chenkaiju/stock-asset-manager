@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { fetchWithProxy, fetchTextWithProxy } from '../utils/api';
 import { Icons } from './Icons';
 
-const fmt = (n, digits = 2) =>
-    n == null ? '--' : n.toLocaleString('zh-TW', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const fmt = (n, digits = 2, maxDigits = digits) =>
+    n == null ? '--' : n.toLocaleString('zh-TW', { minimumFractionDigits: digits, maximumFractionDigits: maxDigits });
 
 /**
  * Parse the `root.App.main = {...}` JSON block from Yahoo 奇摩股市 HTML
@@ -416,7 +416,7 @@ export const DividendTab = ({ data }) => {
                                         </td>
                                         <td style={{ ...cellStyle, textAlign: 'right', fontWeight: 700,
                                             color: r.isToday ? '#b45309' : 'var(--color-primary)' }}>
-                                            {fmt(r.現金股利)}
+                                            {fmt(r.現金股利, 2, 4)}
                                         </td>
                                         <td style={{ ...cellStyle, textAlign: 'right',
                                             color: r.股票股利 != null
